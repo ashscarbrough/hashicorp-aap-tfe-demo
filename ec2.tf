@@ -1,4 +1,4 @@
-resource "aws_instance" "web" {
+resource "aws_instance" "aap_tfe_demo_host" {
   ami                  = local.ami_id
   instance_type        = local.ec2_instance_type
   user_data            = file(local.user_data_script)
@@ -11,7 +11,6 @@ resource "aws_instance" "web" {
     http_tokens   = "required"
     http_endpoint = "enabled"
   }
-
 
   tags = {
     Name = var.ec2_instance_name

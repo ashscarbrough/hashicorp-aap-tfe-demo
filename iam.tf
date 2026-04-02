@@ -1,27 +1,3 @@
-# Modify EC2 metadata.
-
-data "aws_iam_policy_document" "ec2_modify_metadata" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "ec2:ModifyInstanceMetadataOptions"
-    ]
-    resources = [
-      "arn:aws:ec2:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:instance/*"
-    ]
-  }
-}
-
-resource "aws_iam_policy" "ec2_modify_metadata" {
-  name   = "EC2ModifyInstanceMetadataOptions"
-  path   = "/"
-  policy = data.aws_iam_policy_document.ec2_modify_metadata.json
-}
-
-resource "aws_iam_role_policy_attachment" "ec2_modify_metadata" {
-  role       = aws_iam_role.aap_tfe_demo.name
-  policy_arn = aws_iam_policy.ec2_modify_metadata.arn
-}
 
 # # Get secrets from Secrets Manager.
 
