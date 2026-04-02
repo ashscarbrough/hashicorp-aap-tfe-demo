@@ -1,7 +1,7 @@
 resource "aws_instance" "web" {
   ami                  = local.ami_id
   instance_type        = local.ec2_instance_type
-  user_data            = base64encode(file(local.user_data_script))
+  user_data            = file(local.user_data_script)
   monitoring           = true
   iam_instance_profile = aws_iam_instance_profile.aap_tfe_demo.name
   security_groups      = [aws_security_group.aap_tfe_demo.name]
