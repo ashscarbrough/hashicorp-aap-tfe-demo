@@ -13,7 +13,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
       - name: Lint GitHub Actions Workflow Files
-        uses: raven-actions/actionlint@v2.1.1 # v2.0.1
+        uses: raven-actions/actionlint@v2.1.2 # v2.0.1
   yamllint:
     name: YAML
     runs-on: ubuntu-24.04
