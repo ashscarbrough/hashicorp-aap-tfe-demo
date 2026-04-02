@@ -15,6 +15,11 @@ variable "vpc_id" {
   description = "The ID of the VPC used to host Application."
 }
 
+variable "ec2_subnet_id" {
+  type = string
+  description = "The ID of the subnet the EC2 will be deployed to."
+}
+
 variable "route53_zone_name" {
   type        = string
   description = "The name of the Route53 zone used to host the application."
