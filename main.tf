@@ -31,7 +31,7 @@ locals {
   account_id                = data.aws_caller_identity.current.account_id
   region                    = data.aws_region.current.region
   route53_alias_record_name = "${var.aap_tfe_demo_subdomain}.${var.route53_zone_name}"
-  ami_id                    = data.aws_ami.hc-base-ami[0].id
+  ami_id                    = data.aws_ami.hc-base-ami.id
   ami_architecture          = strcontains(var.ec2_instance_ami_name, "arm64") ? "arm64" : "x86_64"
   ec2_instance_type         = coalesce(var.ec2_instance_type, local.ami_architecture == "arm64" ? "t4g.medium" : "t3.medium")
 

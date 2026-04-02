@@ -1,30 +1,12 @@
 
 # Application Settings
-resource "aws_ssm_parameter" "tfe_hostname" {
-  name        = "/TFE/TFE_HOSTNAME"
-  description = "Terraform Enterprise Hostname"
-  type        = "SecureString"
-  key_id      = data.aws_kms_key.ssm.id
-  value       = local.route53_alias_record_name
-}
-
-# Object Storage Settings
-
-resource "aws_ssm_parameter" "tfe_object_storage_s3_region" {
-  name        = "/TFE/TFE_OBJECT_STORAGE_S3_REGION"
-  description = "Terraform Enterprise Object Storage S3 Region"
-  type        = "SecureString"
-  key_id      = data.aws_kms_key.ssm.id
-  value       = data.aws_region.current.region
-}
-
-resource "aws_ssm_parameter" "tfe_object_storage_s3_bucket" {
-  name        = "/TFE/TFE_OBJECT_STORAGE_S3_BUCKET"
-  description = "Terraform Enterprise Object Storage S3 Bucket"
-  type        = "SecureString"
-  key_id      = data.aws_kms_key.ssm.id
-  value       = aws_s3_bucket.tfe.id
-}
+# resource "aws_ssm_parameter" "aap_hostname" {
+#   name        = "/AAP/AAP_HOSTNAME"
+#   description = "Automation and Provisioning Hostname"
+#   type        = "SecureString"
+#   key_id      = data.aws_kms_key.ssm.id
+#   value       = local.route53_alias_record_name
+# }
 
 
 # SSM Agent Auto-Update Association

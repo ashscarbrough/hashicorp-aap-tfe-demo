@@ -19,44 +19,44 @@ resource "aws_iam_policy" "ec2_modify_metadata" {
 }
 
 resource "aws_iam_role_policy_attachment" "ec2_modify_metadata" {
-  role       = aws_iam_role.tfe.name
+  role       = aws_iam_role.aap_tfe_demo.name
   policy_arn = aws_iam_policy.ec2_modify_metadata.arn
 }
 
-# Get secrets from Secrets Manager.
+# # Get secrets from Secrets Manager.
 
-data "aws_iam_policy_document" "aap_tfe_demo_secrets_manager" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "secretsmanager:GetResourcePolicy",
-      "secretsmanager:GetSecretValue",
-      "secretsmanager:DescribeSecret",
-      "secretsmanager:ListSecretVersionIds"
-    ]
-    resources = [
-      aws_db_instance.aap_tfe_demo.master_user_secret[0].secret_arn
-    ]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
-      "secretsmanager:ListSecrets"
-    ]
-    resources = ["*"]
-  }
-}
+# data "aws_iam_policy_document" "aap_tfe_demo_secrets_manager" {
+#   statement {
+#     effect = "Allow"
+#     actions = [
+#       "secretsmanager:GetResourcePolicy",
+#       "secretsmanager:GetSecretValue",
+#       "secretsmanager:DescribeSecret",
+#       "secretsmanager:ListSecretVersionIds"
+#     ]
+#     resources = [
+#       "*"
+#     ]
+#   }
+#   statement {
+#     effect = "Allow"
+#     actions = [
+#       "secretsmanager:ListSecrets"
+#     ]
+#     resources = ["*"]
+#   }
+# }
 
-resource "aws_iam_policy" "aap_tfe_demo_secrets_manager" {
-  name   = "SecretsManagerReadAAPTFESecrets"
-  path   = "/"
-  policy = data.aws_iam_policy_document.aap_tfe_demo_secrets_manager.json
-}
+# resource "aws_iam_policy" "aap_tfe_demo_secrets_manager" {
+#   name   = "SecretsManagerReadAAPTFESecrets"
+#   path   = "/"
+#   policy = data.aws_iam_policy_document.aap_tfe_demo_secrets_manager.json
+# }
 
-resource "aws_iam_role_policy_attachment" "aap_tfe_demo_secrets_manager" {
-  role       = aws_iam_role.aap_tfe_demo.name
-  policy_arn = aws_iam_policy.aap_tfe_demo_secrets_manager.arn
-}
+# resource "aws_iam_role_policy_attachment" "aap_tfe_demo_secrets_manager" {
+#   role       = aws_iam_role.aap_tfe_demo.name
+#   policy_arn = aws_iam_policy.aap_tfe_demo_secrets_manager.arn
+# }
 
 resource "aws_iam_role_policy_attachment" "ssm_managed_instance_core" {
   role       = aws_iam_role.aap_tfe_demo.name

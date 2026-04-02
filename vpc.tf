@@ -4,7 +4,7 @@
 resource "aws_security_group" "aap_tfe_demo" {
   name        = var.ec2_security_group_name
   description = "EC2 Hosts Security Group"
-  vpc_id      = module.vpc.vpc_id
+  vpc_id      = var.vpc_id
 
   tags = {
     Name = var.ec2_security_group_name
@@ -22,7 +22,7 @@ resource "aws_vpc_security_group_ingress_rule" "aap_tfe_demo_https" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "aap_tfe_demo" {
-  security_group_id = aws_security_group.tfe.id
+  security_group_id = aws_security_group.aap_tfe_demo.id
   description       = "Allow all outbound traffic from the AAP TFE demo instances."
 
   cidr_ipv4   = "0.0.0.0/0"
