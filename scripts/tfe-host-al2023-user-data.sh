@@ -65,26 +65,6 @@ get_ec2_private_ip_address() {
   curl -s -H "X-aws-ec2-metadata-token: ${aws_token}" http://169.254.169.254/latest/meta-data/local-ipv4
 }
 
-wait_for_tfe_service() {
-  log "  Checking the status of the TFE service."
-  while ! docker compose -f /run/terraform-enterprise/docker-compose.yml exec tfe /usr/local/bin/tfectl app status >/dev/null 2>&1; do
-    log "    Waiting for TFE to come online..."
-    sleep 1
-  done
-}
-
-wait_for_tfe_nodes() {
-  log "  Checking the status of the TFE nodes."
-  while docker compose -f /run/terraform-enterprise/docker-compose.yml exec tfe /usr/local/bin/tfectl node list |
-    grep -q "No active nodes"; do
-    log "    Waiting for an active TFE node..."
-    sleep 1
-  done
-}
-
-get_tfe_admin_token_url() {
-  docker compose -f /run/terraform-enterprise/docker-compose.yml exec tfe /usr/local/bin/tfectl admin token --url
-}
 
 main() {
   set -ef

@@ -1,15 +1,39 @@
 resource "aws_instance" "aap_tfe_demo_host" {
   ami                  = local.ami_id
   instance_type        = local.ec2_instance_type
+  key_name             = aws_key_pair.aap_tfe_demo_host.key_name
+
   user_data            = file(local.user_data_script)
   monitoring           = true
+
   iam_instance_profile = aws_iam_instance_profile.aap_tfe_demo.name
+
   subnet_id            = var.ec2_subnet_id
   vpc_security_group_ids = [aws_security_group.aap_tfe_demo.id]
 
   tags = {
     Name = var.ec2_instance_name
   }
+}
+
+resource "tls_private_key" "aap_tfe_demo_host" {
+  algorithm = "ED25519"
+}
+
+resource "aws_key_pair" "aap_tfe_demo_host" {
+  key_name   = "${var.key_name}-ec2-key"
+  public_key = tls_private_key.aap_tfe_demo_host.public_key_openssh
+}
+
+resource "aws_secretsmanager_secret" "aap_tfe_demo_host_private_key" {
+  name                    = "${var.key_name}/ec2-private-key"
+  description             = "ED25519 private key for EC2 SSH access"
+  recovery_window_in_days = 0
+}
+
+resource "aws_secretsmanager_secret_version" "aap_tfe_demo_host_private_key" {
+  secret_id     = aws_secretsmanager_secret.aap_tfe_demo_host_private_key.id
+  secret_string = tls_private_key.aap_tfe_demo_host.private_key_openssh
 }
 
 

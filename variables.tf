@@ -20,6 +20,11 @@ variable "ec2_subnet_id" {
   description = "The ID of the subnet the EC2 will be deployed to."
 }
 
+variable "aap_agent_cidr" {
+  type        = string
+  description = "The CIDR block representing the network location of the AAP agent(s) that will connect to the EC2 instance. This is used to scope the security group ingress rule allowing SSH access from the AAP agent(s). For example, if the AAP agent is running on a machine with IP address 192.168.1.100, the CIDR block would be 192.168.1.100/32."
+}
+
 variable "route53_zone_name" {
   type        = string
   description = "The name of the Route53 zone used to host the application."
@@ -44,6 +49,12 @@ variable "ec2_security_group_name" {
 
 
 # EC2
+
+variable "key_name" {
+  type        = string
+  description = "The name of the key pair used for EC2 SSH access."
+  default     = "aap-tfe-demo"
+}
 
 variable "ec2_instance_ami_name" {
   type        = string
