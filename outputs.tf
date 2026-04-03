@@ -26,6 +26,6 @@ output "secretsmanager_secret_arn_ec2_private_key" {
 }
 
 output "ec2_private_key" {
-  value     = tls_private_key.ec2.private_key_openssh
+  value     = tls_private_key.ec2.aap_tfe_demo_host
   sensitive = true
 }
