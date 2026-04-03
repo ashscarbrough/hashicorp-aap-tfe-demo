@@ -8,6 +8,7 @@ resource "aws_instance" "aap_tfe_demo_host" {
 
   iam_instance_profile = aws_iam_instance_profile.aap_tfe_demo.name
 
+  associate_public_ip_address = true
   subnet_id            = var.ec2_subnet_id
   vpc_security_group_ids = [aws_security_group.aap_tfe_demo.id]
 
