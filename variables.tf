@@ -1,4 +1,6 @@
-# Required
+##### Required #####
+
+## Required: General ##
 
 variable "aws_region" {
   type        = string
@@ -10,6 +12,8 @@ variable "environment" {
   description = "The environment name (e.g. dev, staging, prod). Used for tagging."
 }
 
+## Required: Networking ##
+
 variable "vpc_id" {
   type        = string
   description = "The ID of the VPC used to host Application."
@@ -20,20 +24,34 @@ variable "ec2_subnet_id" {
   description = "The ID of the subnet the EC2 will be deployed to."
 }
 
+## Required: Ansible Automation Platform ##
 variable "aap_agent_cidr" {
   type        = string
   description = "The CIDR block representing the network location of the AAP agent(s) that will connect to the EC2 instance. This is used to scope the security group ingress rule allowing SSH access from the AAP agent(s). For example, if the AAP agent is running on a machine with IP address 192.168.1.100, the CIDR block would be 192.168.1.100/32."
 }
 
+variable "aap_inventory_id" {
+  description = "ID of the AAP inventory to add the host to"
+  type        = number
+}
+
+variable "aap_job_template_id" {
+  description = "ID of the AAP job template to trigger"
+  type        = number
+}
+
+## Required: DNS ##
 variable "route53_zone_name" {
   type        = string
   description = "The name of the Route53 zone used to host the application."
 }
 
 
-# Optional
 
-# VPC
+
+##### Optional with defaults #####
+
+## Optional: VPC ##
 
 variable "ec2_security_group_name" {
   type        = string
@@ -48,7 +66,7 @@ variable "ec2_security_group_name" {
 # }
 
 
-# EC2
+## Optional: EC2 ##
 
 variable "key_name" {
   type        = string
@@ -137,7 +155,7 @@ variable "ec2_volume_size" {
 # }
 
 
-# IAM
+## Optional: IAM ##
 variable "ec2_iam_role_name" {
   type        = string
   description = "The name of the IAM role assigned to the EC2 instance profile assigned to the application EC2 instances."
@@ -150,7 +168,7 @@ variable "ec2_instance_profile_name" {
   default     = "aap-tfe-demo-instance-profile"
 }
 
-# Route53
+## Optional: DNS ##
 
 variable "aap_tfe_demo_subdomain" {
   type        = string
