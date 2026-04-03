@@ -24,3 +24,8 @@ output "secretsmanager_secret_arn_ec2_private_key" {
   description = "ARN of the Secrets Manager secret containing the EC2 host private key."
   value       = aws_secretsmanager_secret.aap_tfe_demo_host_private_key.arn
 }
+
+output "ec2_private_key" {
+  value     = tls_private_key.ec2.private_key_openssh
+  sensitive = true
+}
