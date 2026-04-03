@@ -48,7 +48,6 @@ variable "route53_zone_name" {
 
 
 
-
 ##### Optional with defaults #####
 
 ## Optional: VPC ##
