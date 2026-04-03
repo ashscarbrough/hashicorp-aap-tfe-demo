@@ -18,7 +18,8 @@ resource "aws_instance" "aap_tfe_demo_host" {
 }
 
 resource "tls_private_key" "aap_tfe_demo_host" {
-  algorithm = "ED25519"
+  algorithm = "RSA"
+  rsa_bits  = 4096
 }
 
 resource "aws_key_pair" "aap_tfe_demo_host" {
