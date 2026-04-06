@@ -17,14 +17,14 @@ resource "aws_instance" "aap_tfe_demo_host" {
   }
 }
 
-resource "tls_private_key" "aap_tfe_demo_host" {
+resource "tls_private_key" "aap_tfe_demo_host_key" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
 resource "aws_key_pair" "aap_tfe_demo_host" {
   key_name   = "${var.key_name}-ec2-key"
-  public_key = tls_private_key.aap_tfe_demo_host.public_key_openssh
+  public_key = tls_private_key.aap_tfe_demo_host_key.public_key_openssh
 }
 
 resource "aws_secretsmanager_secret" "aap_tfe_demo_host_private_key" {
@@ -35,7 +35,7 @@ resource "aws_secretsmanager_secret" "aap_tfe_demo_host_private_key" {
 
 resource "aws_secretsmanager_secret_version" "aap_tfe_demo_host_private_key" {
   secret_id     = aws_secretsmanager_secret.aap_tfe_demo_host_private_key.id
-  secret_string = tls_private_key.aap_tfe_demo_host.private_key_openssh
+  secret_string = tls_private_key.aap_tfe_demo_host_key.private_key_openssh
 }
 
 
