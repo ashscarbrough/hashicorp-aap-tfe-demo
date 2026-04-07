@@ -4,8 +4,8 @@ locals {
   ansible_ssh_user = strcontains(var.ec2_instance_ami_name, "ubuntu") ? "ubuntu" : "ec2-user"
 }
 
-resource "aap_host" "ec2" {
-  name         = aws_instance.aap_tfe_demo_host.public_dns
+resource "aap_host" "ec2_demo_host" {
+  name         = aws_instance.aap_tfe_demo_host.public_dns  # Can use public IP or DNS as the host name in AAP inventory
   inventory_id = var.aap_inventory_id
   variables    = jsonencode({
     ansible_host            = aws_instance.aap_tfe_demo_host.public_ip
@@ -14,12 +14,7 @@ resource "aap_host" "ec2" {
   })
 }
 
-data "aws_secretsmanager_secret_version" "aap_tfe_demo_host_private_key" {
-  secret_id  = aws_secretsmanager_secret.aap_tfe_demo_host_private_key.id
-  depends_on = [aws_secretsmanager_secret_version.aap_tfe_demo_host_private_key]
-}
-
-resource "aap_job" "provision" {
+resource "aap_job" "provision_job" {
   job_template_id = var.aap_job_template_id
   inventory_id    = var.aap_inventory_id
 
