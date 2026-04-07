@@ -38,7 +38,7 @@ data "http" "hcp_terraform_ip_ranges" {
 }
 
 locals {
-  hcp_terraform_cidrs = jsondecode(data.http.hcp_terraform_ip_ranges.response_body).terraform
+  hcp_terraform_cidrs = jsondecode(data.http.hcp_terraform_ip_ranges.response_body).api
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ssh_from_hcp_terraform" {
@@ -53,7 +53,6 @@ resource "aws_vpc_security_group_ingress_rule" "ssh_from_hcp_terraform" {
 
 
 ### Egress rule for EC2 instances - allow all outbound traffic
-
 resource "aws_vpc_security_group_egress_rule" "aap_tfe_demo" {
   security_group_id = aws_security_group.aap_tfe_demo.id
   description       = "Allow all outbound traffic from the AAP TFE demo instances."
