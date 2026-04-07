@@ -23,7 +23,7 @@ resource "aap_job" "provision_job" {
   })
 
   depends_on = [
-    aap_host.ec2,
+    aap_host.ec2_demo_host,
     aws_instance.aap_tfe_demo_host
   ]
 }
