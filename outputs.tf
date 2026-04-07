@@ -31,6 +31,6 @@ output "ec2_private_key" {
 }
 
 output "aap_job_id" {
-  value       = aap_job.provision.id
+  value       = aap_job.provision
   description = "AAP job ID — use this to find the job run in AAP UI"
 }
