@@ -29,3 +29,8 @@ output "ec2_private_key" {
   value     = tls_private_key.aap_tfe_demo_host_key.private_key_openssh
   sensitive = true
 }
+
+output "aap_job_id" {
+  value       = aap_job.provision.id
+  description = "AAP job ID — use this to find the job run in AAP UI"
+}

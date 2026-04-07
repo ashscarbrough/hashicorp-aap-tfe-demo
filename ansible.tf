@@ -10,7 +10,6 @@ resource "aap_host" "ec2" {
   variables    = jsonencode({
     ansible_host            = aws_instance.aap_tfe_demo_host.public_ip
     ansible_user            = local.ansible_ssh_user
-    ansible_ssh_private_key  = data.aws_secretsmanager_secret_version.aap_tfe_demo_host_private_key.secret_string  # Private key will be pulled from Secrets Manager at runtime
     ansible_ssh_common_args = "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
   })
 }

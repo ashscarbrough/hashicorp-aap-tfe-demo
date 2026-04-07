@@ -18,5 +18,9 @@ terraform {
       source  = "ansible/aap"
       version = "~> 1.4.0"
     }
+    null = {
+      source  = "hashicorp/null"
+      version = ">= 3.0"
+    }
   }
 }
