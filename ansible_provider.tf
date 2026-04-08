@@ -24,6 +24,7 @@ resource "aap_job" "provision_job" {
 
   depends_on = [
     aap_host.ec2_demo_host,
-    aws_instance.aap_tfe_demo_host
+    aws_instance.aap_tfe_demo_host,
+    null_resource.wait_for_ssh
   ]
 }
