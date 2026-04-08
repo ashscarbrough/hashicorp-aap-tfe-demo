@@ -15,7 +15,7 @@ resource "aap_host" "ec2_demo_host" {
 }
 
 resource "aap_job" "provision_job" {
-  job_template_id = var.aap_job_template_id
+  job_template_id = var.aap_provider_job_template_id
   inventory_id    = var.aap_inventory_id
 
   extra_vars = jsonencode({

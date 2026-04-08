@@ -43,14 +43,15 @@ resource "aws_instance" "aap_tfe_demo_host" {
     # SSH keys are injected at instance launch. Recreate the instance if key material changes.
     replace_triggered_by = [aws_key_pair.aap_tfe_demo_host]
 
-    # action_trigger {
-    #   events  = [after_create, after_update]
-    #   actions = [action.aap_job_launch.run_playbook]
-    # }
+    action_trigger {
+      events  = [after_create, after_update]
+      actions = [action.aap_job_launch.run_playbook]
+    }
   }
 
   tags = {
     Name = var.ec2_instance_name
+    ManagedBy = "terraform"
   }
 }
 

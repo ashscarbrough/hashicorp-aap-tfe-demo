@@ -1,7 +1,5 @@
 ##### Required #####
 
-## Required: General ##
-
 variable "aws_region" {
   type        = string
   description = "The AWS region to deploy resources into."
@@ -12,8 +10,6 @@ variable "environment" {
   description = "The environment name (e.g. dev, staging, prod). Used for tagging."
 }
 
-## Required: Networking ##
-
 variable "vpc_id" {
   type        = string
   description = "The ID of the VPC used to host Application."
@@ -21,8 +17,9 @@ variable "vpc_id" {
 
 variable "ec2_subnet_id" {
   type = string
-  description = "The ID of the subnet the EC2 will be deployed to."
+  description = "The ID of the subnet the EC2 instance will be deployed to."
 }
+
 
 ## Required: Ansible Automation Platform ##
 variable "aap_agent_cidr" {
@@ -35,37 +32,24 @@ variable "aap_inventory_id" {
   type        = number
 }
 
-variable "aap_job_template_id" {
+variable "aap_provider_job_template_id" {
   description = "ID of the AAP job template to trigger"
   type        = number
 }
 
-## Required: DNS ##
-variable "route53_zone_name" {
-  type        = string
-  description = "The name of the Route53 zone used to host the application."
+variable "aap_tf_actions_job_template_id" {
+  description = "ID of the AAP job template to trigger"
+  type        = number
 }
 
 
-
-##### Optional with defaults #####
-
-## Optional: VPC ##
+##### Optional #####
 
 variable "ec2_security_group_name" {
   type        = string
   description = "The name of the EC2 hosts security group."
   default     = "aap-tfe-demo-sg"
 }
-
-# variable "alb_security_group_name" {
-#   type        = string
-#   description = "The name of the Application Load Balancer security group."
-#   default     = "aap-tfe-demo-alb-sg"
-# }
-
-
-## Optional: EC2 ##
 
 variable "key_name" {
   type        = string
@@ -117,44 +101,6 @@ variable "ec2_volume_size" {
   }
 }
 
-# variable "asg_name" {
-#   type        = string
-#   description = "The name of the ASG for the application EC2 instances."
-#   default     = "aap-tfe-demo-asg"
-# }
-
-# variable "asg_min_size" {
-#   type        = number
-#   description = "The minimum number of application EC2 instances allowed in the auto scaling group."
-#   default     = 0
-# }
-
-# variable "asg_max_size" {
-#   type        = number
-#   description = "The maximum number of application EC2 instances allowed in the auto scaling group."
-#   default     = 2
-# }
-
-# variable "asg_desired_capacity" {
-#   type        = number
-#   description = "The desired number of application EC2 instances active in the auto scaling group."
-#   default     = 2
-# }
-
-# variable "lb_name" {
-#   type        = string
-#   description = "The name of the application load balancer used to distribute HTTPS traffic across application EC2 instances."
-#   default     = "aap-tfe-demo-alb"
-# }
-
-# variable "lb_target_group_name" {
-#   type        = string
-#   description = "The name of the target group used to direct HTTPS traffic to application EC2 instances."
-#   default     = "aap-tfe-demo-alb-tg"
-# }
-
-
-## Optional: IAM ##
 variable "ec2_iam_role_name" {
   type        = string
   description = "The name of the IAM role assigned to the EC2 instance profile assigned to the application EC2 instances."
@@ -166,8 +112,6 @@ variable "ec2_instance_profile_name" {
   description = "The name of the EC2 instance profile assigned to the application EC2 instances."
   default     = "aap-tfe-demo-instance-profile"
 }
-
-## Optional: DNS ##
 
 variable "aap_tfe_demo_subdomain" {
   type        = string

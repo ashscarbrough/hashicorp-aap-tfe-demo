@@ -1,14 +1,4 @@
 
-# Application Settings
-# resource "aws_ssm_parameter" "aap_hostname" {
-#   name        = "/AAP/AAP_HOSTNAME"
-#   description = "Automation and Provisioning Hostname"
-#   type        = "SecureString"
-#   key_id      = data.aws_kms_key.ssm.id
-#   value       = local.route53_alias_record_name
-# }
-
-
 # SSM Agent Auto-Update Association
 #
 # Runs AWS-UpdateSSMAgent on all instances tagged ManagedBy=terraform at
