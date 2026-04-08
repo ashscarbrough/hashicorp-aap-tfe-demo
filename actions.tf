@@ -21,7 +21,6 @@
 
 # Define an action to send a payload to AAP API.
 action "aap_job_launch" "run_playbook" {
-  depends_on = [aap_host.ec2_demo_host]
   config {
     job_template_id     = var.aap_tf_actions_job_template_id
     wait_for_completion = true
