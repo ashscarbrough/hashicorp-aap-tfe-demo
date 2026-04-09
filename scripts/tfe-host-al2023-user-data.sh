@@ -163,6 +163,7 @@ EOF
     fi
     sleep 2
   done
+  log "  Docker daemon is ready."
 
 }
 
