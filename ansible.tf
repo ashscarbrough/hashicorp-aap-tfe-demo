@@ -14,6 +14,8 @@ resource "aap_host" "ec2_demo_host" {
   })
 }
 
+## AAP Playbook execution Path 1 ##
+# job triggered via AAP Job resource after EC2 instance provisioning and cloud-init completion.
 resource "aap_job" "provision_job" {
   job_template_id = var.aap_provider_job_template_id
   inventory_id    = var.aap_inventory_id

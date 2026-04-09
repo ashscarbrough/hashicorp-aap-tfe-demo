@@ -24,7 +24,7 @@ resource "aws_secretsmanager_secret_version" "aap_tfe_demo_host_private_key" {
 }
 
 
-# AWS EC2 instanc
+# AWS EC2 instance
 resource "aws_instance" "aap_tfe_demo_host" {
   ami                  = local.ami_id
   instance_type        = local.ec2_instance_type
@@ -52,6 +52,7 @@ resource "aws_instance" "aap_tfe_demo_host" {
   tags = {
     Name = var.ec2_instance_name
     ManagedBy = "terraform"
+    AnsibleManaged = "true"
   }
 }
 
