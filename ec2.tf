@@ -26,7 +26,7 @@ resource "aws_secretsmanager_secret_version" "aap_tfe_demo_host_private_key" {
 
 # AWS EC2 instance
 resource "aws_instance" "aap_tfe_demo_host" {
-  ami                  = local.ami_id
+  ami                  = data.hcp_packer_artifact.al2023_demo.external_identifier  # local.ami_id 
   instance_type        = local.ec2_instance_type
   key_name             = aws_key_pair.aap_tfe_demo_host.key_name
 
@@ -40,8 +40,9 @@ resource "aws_instance" "aap_tfe_demo_host" {
   vpc_security_group_ids = [aws_security_group.aap_tfe_demo.id]
 
   lifecycle {
+    create_before_destroy = true
     # SSH keys are injected at instance launch. Recreate the instance if key material changes.
-    replace_triggered_by = [aws_key_pair.aap_tfe_demo_host]
+    replace_triggered_by = [aws_key_pair.aap_tfe_demo_host, data.hcp_packer_artifact.al2023_demo.external_identifier] 
 
     action_trigger {
       events  = [after_create, after_update]
@@ -53,6 +54,7 @@ resource "aws_instance" "aap_tfe_demo_host" {
     Name = var.ec2_instance_name
     ManagedBy = "terraform"
     AnsibleManaged = "true"
+    AMIVersion     = data.hcp_packer_artifact.al2023_demo.id
   }
 }
 
