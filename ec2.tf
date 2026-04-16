@@ -84,7 +84,7 @@ resource "null_resource" "wait_for_ssh" {
 
   provisioner "remote-exec" {
     inline = [
-      "cloud-init status --wait"
+      "timeout 900 cloud-init status --wait"
     ]
   }
 
