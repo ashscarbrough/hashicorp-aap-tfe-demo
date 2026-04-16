@@ -118,3 +118,25 @@ variable "aap_tfe_demo_subdomain" {
   description = "The subdomain used for the application."
   default     = "aap-tfe-demo"
 }
+
+variable "hcp_packer_bucket_name" {
+  description = "HCP Packer bucket name"
+  type        = string
+  default     = "demo-al2023"
+}
+
+variable "hcp_packer_channel_name" {
+  description = "HCP Packer channel name to read latest artifact from"
+  type        = string
+  default     = "latest"
+}
+
+variable "tfe_workspace_id" {
+  description = "Id of the workspace in HCP Terraform to trigger when new Packer artifacts are available"
+  type        = string
+}
+
+variable "tfe_trigger_token" {
+  description = "Trigger token for the workspace in HCP Terraform to trigger when new Packer artifacts are available"
+  type        = string
+}

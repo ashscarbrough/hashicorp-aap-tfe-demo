@@ -1,12 +1,3 @@
-# output "tfe_hostname" {
-#   description = "Fully qualified domain name (FQDN) of the Terraform Enterprise endpoint."
-#   value       = aws_route53_record.alias_record.fqdn
-# }
-
-# output "alb_dns_name" {
-#   description = "DNS name of the Application Load Balancer (ALB) that fronts Terraform Enterprise."
-#   value       = aws_lb.tfe.dns_name
-# }
 
 output "security_group_ids" {
   description = "Map of security group IDs keyed by component: aap_tfe_demo."
@@ -33,4 +24,9 @@ output "ec2_private_key" {
 output "aap_job_id" {
   value       = aap_job.provision_job
   description = "AAP job ID — use this to find the job run in AAP UI"
+}
+
+output "packer_webhook_url" {
+  description = "Lambda function URL to use as HCP Packer webhook endpoint"
+  value       = aws_lambda_function_url.packer_webhook.function_url
 }
