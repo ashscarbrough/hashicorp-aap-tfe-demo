@@ -122,7 +122,7 @@ variable "aap_tfe_demo_subdomain" {
 variable "hcp_packer_bucket_name" {
   description = "HCP Packer bucket name"
   type        = string
-  default     = "demo-al2023"
+  default     = "packer-demo-al2023"
 }
 
 variable "hcp_packer_channel_name" {
