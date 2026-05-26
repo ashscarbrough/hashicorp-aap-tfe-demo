@@ -1,4 +1,12 @@
 terraform {
+cloud {
+  organization = "hashicorp-wwtfo-demo-platform-prod"
+  workspaces {
+    name = "hashicorp-aap-tfe-demo"
+  }
+}
+
+
   required_version = ">= 1.9.0"
 
   required_providers {
