@@ -26,11 +26,6 @@ output "ec2_private_key" {
   sensitive = true
 }
 
-output "aap_job_details" {
-  value       = aap_job.run_new_version_playbook
-  description = "AAP job details — use this to find the job run in AAP UI"
-}
-
 output "packer_webhook_url" {
   description = "Lambda function URL to use as HCP Packer webhook endpoint"
   value       = aws_lambda_function_url.packer_webhook.function_url
