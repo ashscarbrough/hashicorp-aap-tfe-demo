@@ -5,28 +5,11 @@ locals {
 }
 
 resource "aap_host" "ec2_demo_host" {
-  name         = aws_instance.aap_tfe_demo_host.public_dns  # Can use public IP or DNS as the host name in AAP inventory
+  name         = aws_eip.aap_tfe_demo_host.public_ip
   inventory_id = var.aap_inventory_id
   variables    = jsonencode({
-    ansible_host            = aws_instance.aap_tfe_demo_host.public_ip
+    ansible_host            = aws_eip.aap_tfe_demo_host.public_ip
     ansible_user            = local.ansible_ssh_user
     ansible_ssh_common_args = "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
   })
-}
-
-## AAP Playbook execution Path 1 ##
-# job triggered via AAP Job resource after EC2 instance provisioning and cloud-init completion.
-resource "aap_job" "provision_job" {
-  job_template_id = var.aap_provider_job_template_id
-  inventory_id    = var.aap_inventory_id
-
-  extra_vars = jsonencode({
-    target_host = aws_instance.aap_tfe_demo_host.public_ip
-  })
-
-  depends_on = [
-    aap_host.ec2_demo_host,
-    aws_instance.aap_tfe_demo_host,
-    null_resource.wait_for_ssh
-  ]
 }

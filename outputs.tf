@@ -7,8 +7,13 @@ output "security_group_ids" {
 }
 
 output "ec2_instance_ip" {
-  description = "Private IP address for the EC2 instance hosting Terraform Enterprise."
+  description = "Private IP address of the demo EC2 instance."
   value       = aws_instance.aap_tfe_demo_host.private_ip
+}
+
+output "ec2_public_ip" {
+  description = "Elastic IP address of the demo EC2 instance. This address is stable across instance replacements."
+  value       = aws_eip.aap_tfe_demo_host.public_ip
 }
 
 output "secretsmanager_secret_arn_ec2_private_key" {

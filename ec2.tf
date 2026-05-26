@@ -56,7 +56,7 @@ resource "aws_instance" "aap_tfe_demo_host" {
 
     action_trigger {
       events  = [after_create, after_update]
-      actions = [action.aap_job_launch.run_playbook]
+      actions = [action.aap_job_launch.run_new_version_playbook]
     }
   }
 
@@ -68,25 +68,19 @@ resource "aws_instance" "aap_tfe_demo_host" {
   }
 }
 
-# Resource to wait for cloud-init to complete on the EC2 instance before allowing Ansible provisioning to proceed. 
-# This ensures that the instance is fully initialized and ready to accept SSH connections before we attempt to run any Ansible tasks against it.
-resource "null_resource" "wait_for_ssh" {
-  triggers = {
-    instance_id = aws_instance.aap_tfe_demo_host.id
-  }
+# Elastic IP — provides a stable public address that survives EC2 instance replacement.
+# When create_before_destroy replaces the instance (e.g. new AMI), the EIP reassociates
+# to the new instance so the demo URL never changes.
+resource "aws_eip" "aap_tfe_demo_host" {
+  domain = "vpc"
 
-  connection {
-    type        = "ssh"
-    host        = aws_instance.aap_tfe_demo_host.public_ip
-    user        = local.ansible_ssh_user
-    private_key = tls_private_key.aap_tfe_demo_host_key.private_key_openssh
+  tags = {
+    Name      = "${var.ec2_instance_name}-eip"
+    ManagedBy = "terraform"
   }
+}
 
-  provisioner "remote-exec" {
-    inline = [
-      "timeout 900 cloud-init status --wait"
-    ]
-  }
-
-  depends_on = [aws_instance.aap_tfe_demo_host]
+resource "aws_eip_association" "aap_tfe_demo_host" {
+  instance_id   = aws_instance.aap_tfe_demo_host.id
+  allocation_id = aws_eip.aap_tfe_demo_host.id
 }

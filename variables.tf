@@ -32,14 +32,15 @@ variable "aap_inventory_id" {
   type        = number
 }
 
-variable "aap_provider_job_template_id" {
+variable "aap_new_version_job_template_id" {
   description = "ID of the AAP job template to trigger"
   type        = number
 }
 
-variable "aap_tf_actions_job_template_id" {
-  description = "ID of the AAP job template to trigger"
+variable "aap_rollback_job_template_id" {
+  description = "ID of the AAP job template for configure_demo_instance_v1.2.0.yml. Set to a real template ID before using rollback; defaults to 0 (no-op) when rollback is not in use."
   type        = number
+  default     = 0
 }
 
 
