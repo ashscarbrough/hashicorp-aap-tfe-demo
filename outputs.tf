@@ -26,9 +26,9 @@ output "ec2_private_key" {
   sensitive = true
 }
 
-output "aap_job_id" {
-  value       = aap_job.run_new_version_playbook.job_id
-  description = "AAP job ID — use this to find the job run in AAP UI"
+output "aap_job_details" {
+  value       = aap_job.run_new_version_playbook
+  description = "AAP job details — use this to find the job run in AAP UI"
 }
 
 output "packer_webhook_url" {
