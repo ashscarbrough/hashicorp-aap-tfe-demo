@@ -129,7 +129,7 @@ variable "hcp_packer_bucket_name" {
 variable "hcp_packer_channel_name" {
   description = "HCP Packer channel name to read latest artifact from"
   type        = string
-  default     = "latest"
+  default     = "production"
 }
 
 variable "tfe_workspace_id" {

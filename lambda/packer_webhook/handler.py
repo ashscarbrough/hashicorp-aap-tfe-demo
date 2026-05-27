@@ -11,9 +11,10 @@ def lambda_handler(event, context):
     logger.info("Received HCP Packer webhook payload")
     logger.info(json.dumps(event))
 
-    workspace_id = os.environ["TFE_WORKSPACE_ID"]
-    tfe_token    = os.environ["TFE_TOKEN"]
-    tfe_url      = "https://app.terraform.io"
+    workspace_id     = os.environ["TFE_WORKSPACE_ID"]
+    tfe_token        = os.environ["TFE_TOKEN"]
+    tfe_url          = "https://app.terraform.io"
+    channel_filter   = os.environ.get("PACKER_CHANNEL_FILTER", "production")
 
     # Parse the incoming HCP Packer event
     try:
@@ -23,6 +24,25 @@ def lambda_handler(event, context):
     except Exception as e:
         logger.warning(f"Could not parse body: {e}")
         body = {}
+        event_action = "unknown"
+
+    # Extract channel name — HCP Packer webhooks nest channel data under event.data.channel
+    channel_name = (
+        body.get("event", {}).get("data", {}).get("channel", {}).get("name")
+        or body.get("data", {}).get("channel", {}).get("name")
+        or ""
+    )
+    logger.info(f"HCP Packer channel: '{channel_name}' (filter: '{channel_filter}')")
+
+    # Only proceed for the configured channel
+    if channel_name != channel_filter:
+        logger.info(f"Skipping run — channel '{channel_name}' does not match filter '{channel_filter}'")
+        return {
+            "statusCode": 200,
+            "body": json.dumps({
+                "message": f"Skipped — channel '{channel_name}' is not '{channel_filter}'"
+            })
+        }
 
     # Build the HCP Terraform run payload
     run_payload = json.dumps({
