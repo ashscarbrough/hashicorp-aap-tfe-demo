@@ -19,19 +19,15 @@ def lambda_handler(event, context):
     # Parse the incoming HCP Packer event
     try:
         body = json.loads(event.get("body", "{}"))
-        event_action = body.get("event", {}).get("action", "unknown")
+        event_action = body.get("event_action", "unknown")
         logger.info(f"HCP Packer event action: {event_action}")
     except Exception as e:
         logger.warning(f"Could not parse body: {e}")
         body = {}
         event_action = "unknown"
 
-    # Extract channel name — HCP Packer webhooks nest channel data under event.data.channel
-    channel_name = (
-        body.get("event", {}).get("data", {}).get("channel", {}).get("name")
-        or body.get("data", {}).get("channel", {}).get("name")
-        or ""
-    )
+    # Extract channel name from event_payload.channel.name
+    channel_name = body.get("event_payload", {}).get("channel", {}).get("name", "")
     logger.info(f"HCP Packer channel: '{channel_name}' (filter: '{channel_filter}')")
 
     # Only proceed for the configured channel
