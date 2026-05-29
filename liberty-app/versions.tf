@@ -1,11 +1,10 @@
 terraform {
-cloud {
-  organization = "hashicorp-wwtfo-demo-platform-prod"
-  workspaces {
-    name = "hashicorp-aap-tfe-demo"
+  cloud {
+    organization = "hashicorp-wwtfo-demo-platform-prod"
+    workspaces {
+      name = "hashicorp-aap-liberty-app"
+    }
   }
-}
-
 
   required_version = ">= 1.9.0"
 

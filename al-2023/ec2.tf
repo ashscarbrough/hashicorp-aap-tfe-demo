@@ -54,10 +54,10 @@ resource "aws_instance" "aap_tfe_demo_host" {
     # SSH keys are injected at instance launch. Recreate the instance if key material changes.
     replace_triggered_by = [aws_key_pair.aap_tfe_demo_host, null_resource.ami_version_tracker] 
 
-    action_trigger {
-      events  = [after_create, after_update]
-      actions = [action.aap_job_launch.run_new_version_playbook]
-    }
+    # action_trigger {
+    #   events  = [after_create, after_update]
+    #   actions = [action.aap_job_launch.run_new_version_playbook]
+    # }
   }
 
   tags = {

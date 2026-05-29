@@ -49,13 +49,13 @@ variable "aap_rollback_job_template_id" {
 variable "ec2_security_group_name" {
   type        = string
   description = "The name of the EC2 hosts security group."
-  default     = "aap-tfe-demo-sg"
+  default     = "aap-tfe-liberty-base-demo-sg"
 }
 
 variable "key_name" {
   type        = string
   description = "The name of the key pair used for EC2 SSH access."
-  default     = "aap-tfe-demo"
+  default     = "aap-tfe-liberty-base-demo"
 }
 
 variable "ec2_instance_ami_name" {
@@ -78,10 +78,15 @@ variable "ec2_instance_ami_name" {
   }
 }
 
+variable "liberty_version" {
+  type    = string
+  default = "24.0.0.12"  # latest Open Liberty version
+}
+
 variable "ec2_instance_name" {
   type        = string
   description = "The name of the EC2 instance."
-  default     = "aap-tfe-demo-ec2-instance"
+  default     = "aap-tfe-liberty-base"
 }
 
 variable "ec2_instance_type" {
@@ -105,25 +110,25 @@ variable "ec2_volume_size" {
 variable "ec2_iam_role_name" {
   type        = string
   description = "The name of the IAM role assigned to the EC2 instance profile assigned to the application EC2 instances."
-  default     = "aap-tfe-demo-iam-role"
+  default     = "aap-tfe-liberty-base-demo-iam-role"
 }
 
 variable "ec2_instance_profile_name" {
   type        = string
   description = "The name of the EC2 instance profile assigned to the application EC2 instances."
-  default     = "aap-tfe-demo-instance-profile"
+  default     = "aap-tfe-liberty-base-demo-instance-profile"
 }
 
 variable "aap_tfe_demo_subdomain" {
   type        = string
   description = "The subdomain used for the application."
-  default     = "aap-tfe-demo"
+  default     = "aap-tfe-liberty-base-demo"
 }
 
 variable "hcp_packer_bucket_name" {
   description = "HCP Packer bucket name"
   type        = string
-  default     = "packer-demo-al2023"
+  default     = "packer-liberty-base"
 }
 
 variable "hcp_packer_channel_name" {
