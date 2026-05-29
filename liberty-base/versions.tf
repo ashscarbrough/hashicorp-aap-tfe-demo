@@ -1,0 +1,42 @@
+terraform {
+cloud {
+  organization = "hashicorp-wwtfo-demo-platform-prod"
+  workspaces {
+    name = "hashicorp-aap-tfe-demo"
+  }
+}
+
+
+  required_version = ">= 1.9.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 6.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.0"
+    }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
+    }
+    aap = {
+      source  = "ansible/aap"
+      version = "~> 1.4.0"
+    }
+    null = {
+      source  = "hashicorp/null"
+      version = ">= 3.0"
+    }
+    hcp = {
+      source  = "hashicorp/hcp"
+      version = "~> 0.94"
+    }
+    archive = {
+      source  = "hashicorp/archive"
+      version = ">= 2.0"
+    }
+  }
+}
