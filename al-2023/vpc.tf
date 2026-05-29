@@ -11,6 +11,17 @@ resource "aws_security_group" "aap_tfe_demo" {
   }
 }
 
+# ### Ingress rules for EC2 instances (frontend and backend) - allow SSH and HTTPS from anywhere, and restrict SSH access to HCP Terraform workers and AAP agent
+# resource "aws_vpc_security_group_ingress_rule" "aap_tfe_demo_https" {
+#   security_group_id = aws_security_group.aap_tfe_demo.id
+#   description       = "Allow HTTPS traffic ingress to the TFE Hosts from all networks."
+
+#   cidr_ipv4   = "0.0.0.0/0"
+#   ip_protocol = "tcp"
+#   from_port   = 443
+#   to_port     = 443
+# }
+
 ### Ingress rules for EC2 instances (frontend and backend) - allow SSH and HTTPS from anywhere, and restrict SSH access to HCP Terraform workers and AAP agent
 resource "aws_vpc_security_group_ingress_rule" "aap_tfe_demo_https" {
   security_group_id = aws_security_group.aap_tfe_demo.id
@@ -18,8 +29,8 @@ resource "aws_vpc_security_group_ingress_rule" "aap_tfe_demo_https" {
 
   cidr_ipv4   = "0.0.0.0/0"
   ip_protocol = "tcp"
-  from_port   = 443
-  to_port     = 443
+  from_port   = 80
+  to_port     = 80
 }
 
 # Allow SSH from AAP workers
