@@ -1,13 +1,3 @@
-action "aap_job_launch" "essentials_package_install" {
-  config {
-    job_template_id     = 14
-    wait_for_completion = true
-    extra_vars = jsonencode({
-      target_host = aws_eip.aap_tfe_demo_host.public_ip
-    })
-  }
-}
-
 action "aap_job_launch" "install_packages" {
   config {
     job_template_id     = 18
