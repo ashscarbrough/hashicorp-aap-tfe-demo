@@ -30,3 +30,9 @@ output "packer_webhook_url" {
   description = "Lambda function URL to use as HCP Packer webhook endpoint"
   value       = aws_lambda_function_url.packer_webhook.function_url
 }
+
+output "debug_extra_vars" {
+  value = jsonencode({
+    packages = var.packages_to_install
+  })
+}
