@@ -141,3 +141,14 @@ variable "tfe_trigger_token" {
   description = "Trigger token for the workspace in HCP Terraform to trigger when new Packer artifacts are available"
   type        = string
 }
+
+variable "packages_to_install" {
+  description = "List of packages to install on the VM via Ansible"
+  type        = list(object({
+    name    = string
+    version = optional(string)
+  }))
+  default     = [
+    { name = "python3-pip" }
+  ]
+}
