@@ -152,3 +152,9 @@ variable "packages_to_install" {
     { name = "python3-pip" }
   ]
 }
+
+variable "ssm_output_s3_bucket" {
+  description = "S3 bucket name for AWS Systems Manager Session Manager to store session logs. Optional, but recommended for auditing and troubleshooting purposes."
+  type        = string
+  default     = null
+}
