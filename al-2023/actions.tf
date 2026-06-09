@@ -18,7 +18,6 @@ action "aap_job_launch" "run_new_version_playbook_ssm" {
       target_host                  = aws_instance.aap_tfe_demo_host.public_ip
       ssm_instance_id              = aws_instance.aap_tfe_demo_host.id
       aws_region                   = var.aws_region
-      ansible_connection           = "community.aws.aws_ssm"
       ssm_bucket_name              = var.ssm_output_s3_bucket
       ansible_python_interpreter   = "/usr/bin/python3"
     })
