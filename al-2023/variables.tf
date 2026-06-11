@@ -1,4 +1,6 @@
-##### Required #####
+# ------------------------------------------------------------
+# Required base variables
+# ------------------------------------------------------------
 
 variable "aws_region" {
   type        = string
@@ -20,8 +22,27 @@ variable "ec2_subnet_id" {
   description = "The ID of the subnet the EC2 instance will be deployed to."
 }
 
+variable "subnet_public_a_id" {
+  type = string
+  description = "The ID of the public subnet A used for the Auto Scaling Group."
+}
 
-## Required: Ansible Automation Platform ##
+variable "subnet_public_b_id" {
+  type = string
+  description = "The ID of the public subnet B used for the Auto Scaling Group."
+}
+
+# ------------------------------------------------------------
+# Required: Ansible Automation Platform ##
+# These variables are used to integrate the EC2 instance with 
+# AAP, but the demo can be deployed without setting them by 
+# leaving them as empty strings or zeroes. See README for details.
+# ------------------------------------------------------------
+variable "aap_hostname" {
+  type        = string
+  description = "The hostname or IP address of the AAP instance managing the inventory and job templates. Used for informational purposes in host variables, but not required for connectivity."
+}
+
 variable "aap_agent_cidr" {
   type        = string
   description = "The CIDR block representing the network location of the AAP agent(s) that will connect to the EC2 instance. This is used to scope the security group ingress rule allowing SSH access from the AAP agent(s). For example, if the AAP agent is running on a machine with IP address 192.168.1.100, the CIDR block would be 192.168.1.100/32."
@@ -43,8 +64,14 @@ variable "aap_rollback_job_template_id" {
   default     = 0
 }
 
+# ------------------------------------------------------------
+# Optional 
+# These variables have default values, but can be customized as needed.
+# ------------------------------------------------------------
 
-##### Optional #####
+# ------------------------------------------------------------
+# EC2 instance variables
+# ------------------------------------------------------------
 
 variable "ec2_security_group_name" {
   type        = string
@@ -114,11 +141,21 @@ variable "ec2_instance_profile_name" {
   default     = "aap-tfe-al2023-demo-instance-profile"
 }
 
-variable "aap_tfe_demo_subdomain" {
+variable "ssm_output_s3_bucket" {
+  description = "S3 bucket name for AWS Systems Manager Session Manager to store session logs. Optional, but recommended for auditing and troubleshooting purposes."
   type        = string
-  description = "The subdomain used for the application."
-  default     = "aap-tfe-al2023-demo"
+  default     = null
 }
+
+# ------------------------------------------------------------
+# HCP Packer variables
+# ------------------------------------------------------------
+
+# variable "aap_tfe_demo_subdomain" {
+#   type        = string
+#   description = "The subdomain used for the application."
+#   default     = "aap-tfe-al2023-demo"
+# }
 
 variable "hcp_packer_bucket_name" {
   description = "HCP Packer bucket name"
@@ -142,6 +179,10 @@ variable "tfe_trigger_token" {
   type        = string
 }
 
+# ------------------------------------------------------------
+# Ansible variables
+# ------------------------------------------------------------
+
 variable "packages_to_install" {
   description = "List of packages to install on the VM via Ansible"
   type        = list(object({
@@ -153,8 +194,24 @@ variable "packages_to_install" {
   ]
 }
 
-variable "ssm_output_s3_bucket" {
-  description = "S3 bucket name for AWS Systems Manager Session Manager to store session logs. Optional, but recommended for auditing and troubleshooting purposes."
-  type        = string
-  default     = null
+# ------------------------------------------------------------
+# Auto Scaling Group variables
+# ------------------------------------------------------------
+
+variable "asg_min_size" {
+  description = "Minimum number of instances to maintain in the Auto Scaling Group"
+  type        = number
+  default     = 1
+}
+
+variable "asg_max_size" {
+  description = "Maximum number of instances to maintain in the Auto Scaling Group"
+  type        = number
+  default     = 1
+}
+
+variable "asg_desired_capacity" {
+  description = "Desired number of instances to maintain in the Auto Scaling Group"
+  type        = number
+  default     = 1
 }

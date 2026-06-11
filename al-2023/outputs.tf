@@ -31,8 +31,12 @@ output "packer_webhook_url" {
   value       = aws_lambda_function_url.packer_webhook.function_url
 }
 
-output "debug_extra_vars" {
-  value = jsonencode({
-    packages = var.packages_to_install
-  })
+output "asg_alb_dns_name" {
+  description = "ASG ALB DNS name — use this URL for the fleet demo"
+  value       = "http://${aws_lb.al2023_aap_tfe_demo_alb.dns_name}"
+}
+
+output "asg_name" {
+  description = "Auto Scaling Group name"
+  value       = aws_autoscaling_group.aap_demo.name
 }
