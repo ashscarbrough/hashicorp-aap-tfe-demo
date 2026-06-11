@@ -24,15 +24,9 @@ resource "aws_secretsmanager_secret_version" "aap_tfe_demo_host_private_key" {
 }
 
 
-locals {
-  packer_ami_id = data.hcp_packer_artifact.al2023_demo.external_identifier
-}
-
-resource "null_resource" "ami_version_tracker" {
-  triggers = {
-    ami_id = data.hcp_packer_artifact.al2023_demo.external_identifier
-  }
-}
+# locals {
+#   packer_ami_id = data.hcp_packer_artifact.al2023_demo.external_identifier
+# }
 
 # AWS EC2 instance
 resource "aws_instance" "aap_tfe_demo_host" {
