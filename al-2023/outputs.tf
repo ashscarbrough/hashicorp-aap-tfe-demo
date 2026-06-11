@@ -38,5 +38,5 @@ output "asg_alb_dns_name" {
 
 output "asg_name" {
   description = "Auto Scaling Group name"
-  value       = aws_autoscaling_group.aap_demo.name
+  value       = aws_autoscaling_group.al2023_aap_tfe_demo_asg.name
 }

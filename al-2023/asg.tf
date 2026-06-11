@@ -54,7 +54,7 @@ resource "aws_autoscaling_group" "al2023_aap_tfe_demo_asg" {
   desired_capacity          = var.asg_desired_capacity
 
   launch_template {
-    id      = aws_launch_template.aap_tfe_demo_host.id
+    id      = aws_launch_template.al2023_aap_tfe_demo_host.id
     version = "$Latest"
   }
   vpc_zone_identifier       = [var.subnet_public_a_id, var.subnet_public_b_id]
