@@ -29,8 +29,7 @@ resource "aws_instance" "aap_tfe_demo_host" {
   instance_type        = local.ec2_instance_type
   key_name             = aws_key_pair.aap_tfe_demo_host.key_name
 
-  user_data            = filebase64(local.user_data_script)
-
+  user_data            = file(local.user_data_script)
   monitoring           = true
 
   iam_instance_profile = aws_iam_instance_profile.aap_tfe_demo.name

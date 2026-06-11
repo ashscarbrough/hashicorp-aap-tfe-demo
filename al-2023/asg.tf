@@ -5,8 +5,7 @@ resource "aws_launch_template" "al2023_aap_tfe_demo_host" {
   name_prefix   = "al2023-asg-demo-host-"
   image_id      = data.hcp_packer_artifact.al2023_demo.external_identifier
   instance_type = var.ec2_instance_type
-
-  user_data            = file(local.user_data_script)
+  user_data     = filebase64(local.user_data_script)
 
   iam_instance_profile {
     name = aws_iam_instance_profile.aap_tfe_demo.name
