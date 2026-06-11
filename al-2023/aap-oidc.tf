@@ -1,7 +1,7 @@
 # oidc.tf
 
 data "tls_certificate" "aap" {
-  url = "${var.aap_hostname}/o"
+  url = "https://${var.aap_hostname}/o"
 }
 
 resource "aws_iam_openid_connect_provider" "aap" {
