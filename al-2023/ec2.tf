@@ -23,18 +23,14 @@ resource "aws_secretsmanager_secret_version" "aap_tfe_demo_host_private_key" {
   secret_string = tls_private_key.aap_tfe_demo_host_key.private_key_openssh
 }
 
-
-# locals {
-#   packer_ami_id = data.hcp_packer_artifact.al2023_demo.external_identifier
-# }
-
 # AWS EC2 instance
 resource "aws_instance" "aap_tfe_demo_host" {
   ami                  = data.hcp_packer_artifact.al2023_demo.external_identifier  # local.ami_id 
   instance_type        = local.ec2_instance_type
   key_name             = aws_key_pair.aap_tfe_demo_host.key_name
 
-  user_data            = file(local.user_data_script)
+  user_data            = filebase64(local.user_data_script)
+
   monitoring           = true
 
   iam_instance_profile = aws_iam_instance_profile.aap_tfe_demo.name
