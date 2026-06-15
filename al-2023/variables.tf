@@ -227,7 +227,7 @@ variable "asg_aap_job_template_id" {
   type        = number
 }
 
-variable "asg_aap_inventory_source_id" {
+variable "asg_aap_inventory_id" {
   description = "ID of the AAP inventory source to sync from the ASG lifecycle hook Lambda function"
   type        = number
 }

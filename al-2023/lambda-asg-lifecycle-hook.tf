@@ -23,7 +23,7 @@ resource "aws_lambda_function" "al2023_asg_lifecycle_hook" {
       AAP_HOST               = var.aap_hostname
       AAP_TOKEN              = var.aap_token
       AAP_JOB_TEMPLATE_ID    = var.asg_aap_job_template_id
-      AAP_INVENTORY_SOURCE_ID = var.asg_aap_inventory_source_id
+      AAP_INVENTORY_SOURCE_ID = var.asg_aap_inventory_id
     }
   }
 }
