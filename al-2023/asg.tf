@@ -63,7 +63,7 @@ resource "aws_autoscaling_group" "al2023_aap_tfe_demo_asg" {
   wait_for_elb_capacity = var.asg_desired_capacity
 
   tag {
-    key                 = "Name"
+    key                 = "GroupName"
     value               = "al2023-asg"
     propagate_at_launch = false
   }
@@ -133,4 +133,13 @@ resource "aws_lb_listener" "al2023_aap_tfe_demo_listener" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.al2023_aap_tfe_demo_tg.arn
   }
+}
+
+# Lifecycle hook — pauses instance launch until AAP completes
+resource "aws_autoscaling_lifecycle_hook" "al2023_asg_aap_configure" {
+  name                   = "al2023-asg-aap-configure"
+  autoscaling_group_name = aws_autoscaling_group.al2023_aap_tfe_demo_asg.name
+  lifecycle_transition   = "autoscaling:EC2_INSTANCE_LAUNCHING"
+  heartbeat_timeout      = 600
+  default_result         = "CONTINUE"
 }

@@ -43,6 +43,12 @@ variable "aap_hostname" {
   description = "The hostname or IP address of the AAP instance managing the inventory and job templates. Used for informational purposes in host variables, but not required for connectivity."
 }
 
+variable "aap_token" {
+  type        = string
+  sensitive   = true
+  description = "The API token for authenticating to the AAP instance. Required for the Lambda function to trigger Ansible playbook runs, but can be left empty if not using that feature."
+}
+
 variable "aap_agent_cidr" {
   type        = string
   description = "The CIDR block representing the network location of the AAP agent(s) that will connect to the EC2 instance. This is used to scope the security group ingress rule allowing SSH access from the AAP agent(s). For example, if the AAP agent is running on a machine with IP address 192.168.1.100, the CIDR block would be 192.168.1.100/32."
@@ -214,4 +220,14 @@ variable "asg_desired_capacity" {
   description = "Desired number of instances to maintain in the Auto Scaling Group"
   type        = number
   default     = 1
+}
+
+variable "asg_aap_job_template_id" {
+  description = "ID of the AAP job template to trigger from the ASG lifecycle hook Lambda function"
+  type        = number
+}
+
+variable "asg_aap_inventory_source_id" {
+  description = "ID of the AAP inventory source to sync from the ASG lifecycle hook Lambda function"
+  type        = number
 }

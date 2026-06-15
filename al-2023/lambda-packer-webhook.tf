@@ -1,3 +1,7 @@
+# ------------------------------------------------------------------------------
+# Lambda function for HCP Packer webhook
+# ------------------------------------------------------------------------------
+
 # Zip the Lambda function code
 data "archive_file" "packer_webhook" {
   type        = "zip"
