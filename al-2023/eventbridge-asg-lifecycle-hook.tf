@@ -19,5 +19,5 @@ resource "aws_cloudwatch_event_rule" "al2023_asg_instance_launch" {
 resource "aws_cloudwatch_event_target" "aap_asg_trigger" {
   rule      = aws_cloudwatch_event_rule.al2023_asg_instance_launch.name
   target_id = "aap-al2023-asg-lifecycle-hook-lambda"
-  arn       = aws_lambda_function.asg_lifecycle_hook.arn
+  arn       = aws_lambda_function.al2023_asg_lifecycle_hook.arn
 }
