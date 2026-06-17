@@ -1,3 +1,7 @@
+# ------------------------------------------------------------------------------
+# Lambda function for HCP Packer webhook
+# ------------------------------------------------------------------------------
+
 # Zip the Lambda function code
 data "archive_file" "packer_webhook" {
   type        = "zip"
@@ -7,7 +11,7 @@ data "archive_file" "packer_webhook" {
 
 # IAM role for Lambda
 resource "aws_iam_role" "packer_webhook_lambda" {
-  name = "hcp-packer-webhook-lambda-role"
+  name = "hcp-packer-al2023-webhook-lambda-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -28,7 +32,7 @@ resource "aws_iam_role_policy_attachment" "packer_webhook_lambda_logs" {
 
 # Lambda function
 resource "aws_lambda_function" "packer_webhook" {
-  function_name    = "hcp-packer-webhook"
+  function_name    = "hcp-packer-al2023-webhook"
   filename         = data.archive_file.packer_webhook.output_path
   source_code_hash = data.archive_file.packer_webhook.output_base64sha256
   role             = aws_iam_role.packer_webhook_lambda.arn

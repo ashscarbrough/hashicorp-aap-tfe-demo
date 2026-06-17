@@ -3,7 +3,7 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project     = "aap-tfe-liberty-base-demo"
+      Project     = "aap-tfe-al2023-demo"
       ManagedBy   = "terraform"
       Environment = var.environment
     }

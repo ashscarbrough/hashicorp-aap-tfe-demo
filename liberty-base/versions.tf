@@ -2,7 +2,7 @@ terraform {
   cloud {
     organization = "hashicorp-wwtfo-demo-platform-prod"
     workspaces {
-      name = "hashicorp-aap-liberty-base"
+      name = "hashicorp-aap-tfe-demo"
     }
   }
 
@@ -23,7 +23,7 @@ terraform {
     }
     aap = {
       source  = "ansible/aap"
-      version = "~> 1.4.0"
+      version = "~> 1.5.0"
     }
     null = {
       source  = "hashicorp/null"

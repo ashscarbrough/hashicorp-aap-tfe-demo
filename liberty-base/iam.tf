@@ -1,12 +1,18 @@
+# ------------------------------------------------------------------------------
+# IAM resources for AL2023 demo
+# ------------------------------------------------------------------------------
 
 resource "aws_iam_role_policy_attachment" "ssm_managed_instance_core" {
   role       = aws_iam_role.aap_tfe_demo.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+resource "aws_iam_role_policy_attachment" "s3_read_only" {
+  role       = aws_iam_role.aap_tfe_demo.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+}
 
-# Create an EC2 instance profile using the aap_tfe_demo role.
-
+# Create an EC2 instance profile using the aap_tfe_demo role
 data "aws_iam_policy_document" "aap_tfe_demo_assume_role" {
   statement {
     effect  = "Allow"
