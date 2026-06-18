@@ -17,11 +17,26 @@ resource "aws_iam_role_policy" "packer_s3_access" {
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      Effect   = "Allow"
-      Action   = "s3:GetObject"
-      Resource = "arn:aws:s3:::ams-hashicorp-artifacts/liberty/*"
-    }]
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:HeadObject"
+        ]
+        Resource = "arn:aws:s3:::ams-hashicorp-artifacts/liberty/*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = "s3:ListBucket"
+        Resource = "arn:aws:s3:::ams-hashicorp-artifacts"
+        Condition = {
+          StringLike = {
+            "s3:prefix" = ["liberty/*"]
+          }
+        }
+      }
+    ]
   })
 }
 
