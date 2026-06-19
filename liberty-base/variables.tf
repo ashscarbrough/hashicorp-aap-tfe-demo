@@ -14,7 +14,7 @@ variable "environment" {
 
 variable "vpc_id" {
   type        = string
-  description = "The ID of the VPC used to host Application."
+  description = "The ID of the VPC used to host the application."
 }
 
 variable "ec2_subnet_id" {
@@ -22,14 +22,15 @@ variable "ec2_subnet_id" {
   description = "The ID of the subnet the EC2 instance will be deployed to."
 }
 
-variable "subnet_public_a_id" {
-  type = string
-  description = "The ID of the public subnet A used for the Auto Scaling Group."
+variable "alb_subnet_ids" {
+  type = list(string)
+  description = "The IDs of the subnets to deploy the ALB into. Should be at least 2 for high availability."
 }
 
-variable "subnet_public_b_id" {
-  type = string
-  description = "The ID of the public subnet B used for the Auto Scaling Group."
+variable "ec2_instance_ami_name" {
+  type    = string
+  description = "The name of the AMI to use for the EC2 instance. The data source will look for an AMI with a name that starts with this value."
+  default = "rhel9-base"
 }
 
 # ------------------------------------------------------------
@@ -52,6 +53,12 @@ variable "aap_token" {
 variable "aap_agent_cidr" {
   type        = string
   description = "The CIDR block representing the network location of the AAP agent(s) that will connect to the EC2 instance. This is used to scope the security group ingress rule allowing SSH access from the AAP agent(s). For example, if the AAP agent is running on a machine with IP address 192.168.1.100, the CIDR block would be 192.168.1.100/32."
+  default     = ""
+
+  validation {
+    condition     = var.connect_via_session_manager || trimspace(var.aap_agent_cidr) != ""
+    error_message = "aap_agent_cidr is required when connect_via_session_manager is false. Set connect_via_session_manager=true to use Session Manager without SSH CIDR."
+  }
 }
 
 variable "aap_inventory_id" {
@@ -82,39 +89,19 @@ variable "aap_rollback_job_template_id" {
 variable "ec2_security_group_name" {
   type        = string
   description = "The name of the EC2 hosts security group."
-  default     = "aap-tfe-al2023-demo-sg"
+  default     = "liberty-base-sg"
 }
 
 variable "key_name" {
   type        = string
   description = "The name of the key pair used for EC2 SSH access."
-  default     = "aap-tfe-al2023-demo"
-}
-
-variable "ec2_instance_ami_name" {
-  type        = string
-  description = "The name of the AMI used as a filter for Application EC2 instances.  approved by HashiCorp security."
-  default     = "hc-base-rhel-9-x86_64"
-
-  validation {
-    condition = contains([
-      "debian-13-amd64-20251117-2299",
-      "hc-base-ubuntu-2204",
-      "hc-base-ubuntu-2404-amd64",
-      "hc-base-ubuntu-2404-arm64",
-      "hc-base-al2023-x86_64",
-      "hc-base-al2023-arm64",
-      "hc-base-rhel-9-x86_64",
-      "hc-base-rhel-9-arm64",
-    ], var.ec2_instance_ami_name)
-    error_message = "ec2_instance_ami_name must be one of the approved AMI name patterns."
-  }
+  default     = "liberty-base"
 }
 
 variable "ec2_instance_name" {
   type        = string
   description = "The name of the EC2 instance."
-  default     = "aap-tfe-al2023-demo"
+  default     = "liberty-base"
 }
 
 variable "ec2_instance_type" {
@@ -131,42 +118,30 @@ variable "ec2_volume_size" {
 
   validation {
     condition     = var.ec2_volume_size >= 25
-    error_message = "The root volume must be at least 20 GiB per default standards."
+    error_message = "The root volume must be at least 25 GiB per default standards."
   }
 }
 
 variable "ec2_iam_role_name" {
   type        = string
-  description = "The name of the IAM role assigned to the EC2 instance profile assigned to the application EC2 instances."
-  default     = "aap-tfe-al2023-demo-iam-role"
+  description = "The name of the IAM role to attach to the EC2 instance."
+  default     = "liberty-base-ec2-role"
 }
 
 variable "ec2_instance_profile_name" {
-  type        = string
-  description = "The name of the EC2 instance profile assigned to the application EC2 instances."
-  default     = "aap-tfe-al2023-demo-instance-profile"
-}
-
-variable "ssm_output_s3_bucket" {
-  description = "S3 bucket name for AWS Systems Manager Session Manager to store session logs. Optional, but recommended for auditing and troubleshooting purposes."
-  type        = string
-  default     = null
+  type = string
+  description = "The name of the EC2 instance profile to attach to the instance."
+  default     = "liberty-base-ec2-instance-profile"
 }
 
 # ------------------------------------------------------------
 # HCP Packer variables
 # ------------------------------------------------------------
 
-# variable "aap_tfe_demo_subdomain" {
-#   type        = string
-#   description = "The subdomain used for the application."
-#   default     = "aap-tfe-al2023-demo"
-# }
-
 variable "hcp_packer_bucket_name" {
   description = "HCP Packer bucket name"
   type        = string
-  default     = "packer-demo-al2023"
+  default     = "websphere-liberty-base-demo"
 }
 
 variable "hcp_packer_channel_name" {
@@ -222,12 +197,13 @@ variable "asg_desired_capacity" {
   default     = 1
 }
 
-variable "asg_aap_job_template_id" {
-  description = "ID of the AAP job template to trigger from the ASG lifecycle hook Lambda function"
-  type        = number
-}
-
 variable "asg_aap_inventory_id" {
   description = "ID of the AAP inventory source to sync from the ASG lifecycle hook Lambda function"
   type        = number
+}
+
+variable "connect_via_session_manager" {
+  description = "Whether to connect to the EC2 instance via AWS Systems Manager Session Manager instead of SSH. If true, the Lambda function will use the AWS SDK to start a Session Manager session instead of an SSH session. This requires additional IAM permissions for the Lambda function and SSM agent installed on the EC2 instance, but allows for easier connectivity without managing SSH keys or opening SSH ports in security groups."
+  type        = bool
+  default     = false
 }
