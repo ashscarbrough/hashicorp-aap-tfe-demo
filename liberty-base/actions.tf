@@ -33,7 +33,8 @@
 
 action "aap_job_launch" "current_version_playbook_ssm" {
   config {
-    job_template_id     = 20
+    job_template_id     = var.aap_current_app_version_job_template_id
+    inventory_id        = var.aap_inventory_id
     wait_for_completion = true
     extra_vars = jsonencode({
       ssm_instance_id              = aws_instance.liberty_base_host.id
@@ -48,7 +49,8 @@ action "aap_job_launch" "current_version_playbook_ssm" {
 # The version to restore is determined by the job template itself — no extra vars required.
 action "aap_job_launch" "previous_version_rollback_playbook" {
   config {
-    job_template_id     = 21
+    job_template_id     = var.aap_previous_version_rollback_job_template_id
+    inventory_id        = var.aap_inventory_id
     wait_for_completion = true
     extra_vars = jsonencode({
       ssm_instance_id              = aws_instance.liberty_base_host.id

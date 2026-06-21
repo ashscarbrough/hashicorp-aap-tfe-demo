@@ -56,15 +56,14 @@ variable "aap_inventory_id" {
   type        = number
 }
 
-variable "aap_new_version_job_template_id" {
+variable "aap_current_app_version_job_template_id" {
   description = "ID of the AAP job template to trigger"
   type        = number
 }
 
-variable "aap_rollback_job_template_id" {
+variable "aap_previous_version_rollback_job_template_id" {
   description = "ID of the AAP job template for configure_demo_instance_v1.2.0.yml. Set to a real template ID before using rollback; defaults to 0 (no-op) when rollback is not in use."
   type        = number
-  default     = 0
 }
 
 # ------------------------------------------------------------
@@ -98,7 +97,7 @@ variable "ec2_instance_type" {
   type        = string
   nullable    = true
   description = "The type (size) of the application EC2 instance. Defaults to t3.medium for x86_64 AMIs and t4g.medium for arm64 AMIs."
-  default     = null
+  default     = "t3.medium"
 }
 
 variable "ec2_volume_size" {
