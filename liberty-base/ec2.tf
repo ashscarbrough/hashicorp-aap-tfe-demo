@@ -27,53 +27,39 @@ resource "aws_secretsmanager_secret_version" "aap_tfe_demo_host_private_key" {
   secret_string = tls_private_key.aap_tfe_demo_host_key[0].private_key_openssh
 }
 
-# AWS EC2 instance
+# ── EC2 Instance — remove EIP, keep instance ─────────────────────────────────
+# Replace your existing aws_instance with this. The only changes are:
+# - associate_public_ip_address dropped to false (ALB is the public endpoint)
+# - subnet_id can now be a private subnet if you have one; SSM doesn't need
+#   a public IP as long as you have a VPC endpoint or NAT gateway
 resource "aws_instance" "aap_tfe_demo_host" {
-  ami                  = data.hcp_packer_artifact.al2023_demo.external_identifier  # local.ami_id 
-  instance_type        = local.ec2_instance_type
-  key_name             = var.connect_via_session_manager ? null : aws_key_pair.aap_tfe_demo_host[0].key_name
+  ami           = data.hcp_packer_artifact.liberty_base_image.external_identifier
+  instance_type = var.ec2_instance_type
+  key_name      = var.connect_via_session_manager ? null : aws_key_pair.aap_tfe_demo_host[0].key_name
 
-  user_data            = file(local.user_data_script)
-  monitoring           = true
+  user_data = file("${path.module}/scripts/rhel9-userdata.sh")
+  monitoring = true
 
-  iam_instance_profile = aws_iam_instance_profile.aap_tfe_demo.name
-
-  associate_public_ip_address = true
-  subnet_id            = var.ec2_subnet_id
-  vpc_security_group_ids = [aws_security_group.aap_tfe_demo.id]
+  # Instance no longer needs a public IP — ALB handles public ingress.
+  # SSM connectivity works via VPC endpoint or NAT; does not require public IP.
+  associate_public_ip_address = false
+  subnet_id                   = var.ec2_subnet_id
+  vpc_security_group_ids      = [aws_security_group.aap_tfe_demo.id]
 
   lifecycle {
     create_before_destroy = true
-    # SSH keys are injected at instance launch. Recreate the instance if key material changes.
-    replace_triggered_by = [null_resource.ami_version_tracker]
+    replace_triggered_by  = [null_resource.ami_version_tracker]
 
     action_trigger {
       events  = [after_create, after_update]
-      actions = [action.aap_job_launch.run_new_version_playbook]
+      actions = [action.aap_job_launch.current_version_playbook_ssm]
     }
   }
 
   tags = {
-    Name = var.ec2_instance_name
-    ManagedBy = "terraform"
+    Name           = var.ec2_instance_name
+    ManagedBy      = "terraform"
     AnsibleManaged = "true"
-    AMIVersion     = data.hcp_packer_artifact.al2023_demo.id
+    AMIVersion     = data.hcp_packer_artifact.liberty_base_image.external_identifier
   }
-}
-
-# Elastic IP — provides a stable public address that survives EC2 instance replacement.
-# When create_before_destroy replaces the instance (e.g. new AMI), the EIP reassociates
-# to the new instance so the demo URL never changes.
-resource "aws_eip" "aap_tfe_demo_host" {
-  domain = "vpc"
-
-  tags = {
-    Name      = "${var.ec2_instance_name}-eip"
-    ManagedBy = "terraform"
-  }
-}
-
-resource "aws_eip_association" "aap_tfe_demo_host" {
-  instance_id   = aws_instance.aap_tfe_demo_host.id
-  allocation_id = aws_eip.aap_tfe_demo_host.id
 }

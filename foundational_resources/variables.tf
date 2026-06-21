@@ -12,7 +12,14 @@ variable "environment" {
   description = "The environment name (e.g. dev, staging, prod). Used for tagging."
 }
 
+
 # ------------------------------------------------------------
 # Optional 
 # These variables have default values, but can be customized as needed.
 # ------------------------------------------------------------
+
+variable "ssm_s3_bucket_storage" {
+  type        = string
+  description = "The name of the S3 bucket to ship SSM session logs to. Must match the bucket name in aws_ssm_document.session_manager_prefs."
+  default     = "ams-hashicorp-artifacts"  # replace with your own bucket if desired; just make sure to update the bucket name in aws_ssm_document.session_manager_prefs as well
+}
