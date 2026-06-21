@@ -7,7 +7,7 @@ resource "aws_lb" "liberty_base" {
   name               = "${var.ec2_instance_name}-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.alb.id]
+  security_groups    = [aws_security_group.alb_sg.id]
 
   # ALB requires subnets in at least two AZs
   subnets = var.alb_subnet_ids
