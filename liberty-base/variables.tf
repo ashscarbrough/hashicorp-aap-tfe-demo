@@ -169,29 +169,6 @@ variable "packages_to_install" {
 # Auto Scaling Group variables
 # ------------------------------------------------------------
 
-variable "asg_min_size" {
-  description = "Minimum number of instances to maintain in the Auto Scaling Group"
-  type        = number
-  default     = 1
-}
-
-variable "asg_max_size" {
-  description = "Maximum number of instances to maintain in the Auto Scaling Group"
-  type        = number
-  default     = 1
-}
-
-variable "asg_desired_capacity" {
-  description = "Desired number of instances to maintain in the Auto Scaling Group"
-  type        = number
-  default     = 1
-}
-
-variable "asg_aap_inventory_id" {
-  description = "ID of the AAP inventory source to sync from the ASG lifecycle hook Lambda function"
-  type        = number
-}
-
 variable "connect_via_session_manager" {
   description = "Whether to connect to the EC2 instance via AWS Systems Manager Session Manager instead of SSH. If true, the Lambda function will use the AWS SDK to start a Session Manager session instead of an SSH session. This requires additional IAM permissions for the Lambda function and SSM agent installed on the EC2 instance, but allows for easier connectivity without managing SSH keys or opening SSH ports in security groups."
   type        = bool

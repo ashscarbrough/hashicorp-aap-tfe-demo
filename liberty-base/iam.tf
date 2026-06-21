@@ -37,3 +37,54 @@ resource "aws_iam_instance_profile" "liberty_base_instance_profile" {
   path = "/"
   role = aws_iam_role.liberty_base_role.name
 }
+
+resource "aws_iam_role_policy" "ssm_session_logging" {
+  name = "liberty-base-ssm-session-logging"
+  role = aws_iam_role.liberty_base_role.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "SSMCoreAccess"
+        Effect = "Allow"
+        Action = [
+          "ssm:UpdateInstanceInformation",
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel",
+          "ec2messages:AcknowledgeMessage",
+          "ec2messages:DeleteMessage",
+          "ec2messages:FailMessage",
+          "ec2messages:GetEndpoint",
+          "ec2messages:GetMessages",
+          "ec2messages:SendReply"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "S3SessionLogs"
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:GetEncryptionConfiguration"
+        ]
+        Resource = [
+          "*"
+        ]
+      },
+      {
+        Sid    = "CloudWatchSessionLogs"
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams"
+        ]
+        Resource = "${aws_cloudwatch_log_group.ssm_sessions.arn}:*"
+      }
+    ]
+  })
+}
