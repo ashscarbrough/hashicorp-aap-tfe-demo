@@ -36,7 +36,6 @@ action "aap_job_launch" "current_version_playbook_ssm" {
     job_template_id     = 20
     wait_for_completion = true
     extra_vars = jsonencode({
-      target_host                  = aws_instance.aap_tfe_demo_host.public_ip
       ssm_instance_id              = aws_instance.aap_tfe_demo_host.id
       aws_region                   = var.aws_region
       ansible_python_interpreter   = "/usr/bin/python3"

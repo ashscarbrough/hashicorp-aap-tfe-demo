@@ -39,16 +39,6 @@ variable "ec2_instance_ami_name" {
 # AAP, but the demo can be deployed without setting them by 
 # leaving them as empty strings or zeroes. See README for details.
 # ------------------------------------------------------------
-variable "aap_hostname" {
-  type        = string
-  description = "The hostname or IP address of the AAP instance managing the inventory and job templates. Used for informational purposes in host variables, but not required for connectivity."
-}
-
-variable "aap_token" {
-  type        = string
-  sensitive   = true
-  description = "The API token for authenticating to the AAP instance. Required for the Lambda function to trigger Ansible playbook runs, but can be left empty if not using that feature."
-}
 
 variable "aap_agent_cidr" {
   type        = string
