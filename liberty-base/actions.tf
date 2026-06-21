@@ -36,7 +36,7 @@ action "aap_job_launch" "current_version_playbook_ssm" {
     job_template_id     = 20
     wait_for_completion = true
     extra_vars = jsonencode({
-      ssm_instance_id              = aws_instance.aap_tfe_demo_host.id
+      ssm_instance_id              = aws_instance.liberty_base_host.id
       aws_region                   = var.aws_region
       ansible_python_interpreter   = "/usr/bin/python3"
     })
@@ -51,7 +51,9 @@ action "aap_job_launch" "previous_version_rollback_playbook" {
     job_template_id     = 21
     wait_for_completion = true
     extra_vars = jsonencode({
-      target_host = aws_eip.aap_tfe_demo_host.public_ip
+      ssm_instance_id              = aws_instance.liberty_base_host.id
+      aws_region                   = var.aws_region
+      ansible_python_interpreter   = "/usr/bin/python3"
     })
   }
 }

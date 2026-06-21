@@ -1,24 +1,19 @@
 
 output "security_group_ids" {
-  description = "Map of security group IDs keyed by component: aap_tfe_demo."
+  description = "Map of security group IDs keyed by component: liberty_base."
   value = {
-    aap_tfe_demo = aws_security_group.aap_tfe_demo.id
+    liberty_base = aws_security_group.liberty_base_instance_sg.id
   }
 }
 
-output "ec2_instance_ip" {
-  description = "Private IP address of the demo EC2 instance."
-  value       = aws_instance.aap_tfe_demo_host.private_ip
-}
-
-output "ec2_public_ip" {
-  description = "Elastic IP address of the demo EC2 instance. This address is stable across instance replacements."
-  value       = aws_eip.aap_tfe_demo_host.public_ip
+output "alb_security_group_id" {
+  description = "Security group ID for the ALB in the liberty-base demo."
+  value       = aws_security_group.alb_sg.id
 }
 
 output "secretsmanager_secret_arn_ec2_private_key" {
   description = "ARN of the Secrets Manager secret containing the EC2 host private key."
-  value       = var.connect_via_session_manager ? null : aws_secretsmanager_secret.aap_tfe_demo_host_private_key[0].arn
+  value       = var.connect_via_session_manager ? null : aws_secretsmanager_secret.liberty_base_host_private_key[0].arn
 }
 
 output "ec2_private_key" {
