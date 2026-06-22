@@ -44,34 +44,19 @@ resource "aws_iam_user_policy" "aap_ssm_sessions" {
         Sid    = "SSMSessionManager"
         Effect = "Allow"
         Action = [
-          # Core Session Manager
           "ssm:StartSession",
           "ssm:ResumeSession",
           "ssm:TerminateSession",
-
-          # Run Command (needed for AAP to drive SSM-based playbook execution)
           "ssm:SendCommand",
           "ssm:CancelCommand",
           "ssm:GetCommandInvocation",
           "ssm:ListCommandInvocations",
           "ssm:ListCommands",
-
-          # Session logging to S3 and CloudWatch (matches your existing SSM config)
-          "s3:PutObject",
-          "s3:GetEncryptionConfiguration",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents",
-          "logs:DescribeLogGroups",
-          "logs:DescribeLogStreams",
-
-          # EC2 Instance Connect (needed for browser-based session fallback)
           "ec2-instance-connect:SendSSHPublicKey"
         ]
         Resource = "*"
       },
       {
-        # Scope SSM document access to AWS-provided documents only
-        # Prevents this user from executing arbitrary custom documents
         Sid    = "SSMDocumentAccess"
         Effect = "Allow"
         Action = [
@@ -79,6 +64,35 @@ resource "aws_iam_user_policy" "aap_ssm_sessions" {
           "ssm:DescribeDocument"
         ]
         Resource = "arn:aws:ssm:*::document/AWS-*"
+      },
+      {
+        # SSM connection plugin uses S3 as transport for Ansible modules
+        # Needs full read/write/delete on the SSM session prefix
+        Sid    = "SSMSessionS3Transport"
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:DeleteObject",
+          "s3:ListBucket",
+          "s3:GetBucketLocation",
+          "s3:GetEncryptionConfiguration"
+        ]
+        Resource = [
+          "arn:aws:s3:::ams-hashicorp-artifacts",
+          "arn:aws:s3:::ams-hashicorp-artifacts/*"
+        ]
+      },
+      {
+        Sid    = "CloudWatchSessionLogs"
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams"
+        ]
+        Resource = "*"
       }
     ]
   })
