@@ -75,43 +75,96 @@ resource "aws_lb_listener" "liberty_base_http" {
   }
 }
 
-resource "null_resource" "wait_for_alb_healthy" {
+# -----------------------------------------------------------------------------
+# Step 1: Pre-job -- sync dynamic inventory so AAP knows about the instance
+# before the job launches
+# -----------------------------------------------------------------------------
+
+resource "null_resource" "liberty_base_pre_job" {
   triggers = {
-    instance_id = aws_instance.liberty_base_host.id
+    instance_id = aws_instance.liberty_base.id
+    ami_id      = data.hcp_packer_artifact.al2023_demo.external_identifier
   }
 
   provisioner "local-exec" {
     command = <<-EOT
-      echo "Waiting for instance ${aws_instance.liberty_base_host.id} to become healthy..."
-      echo "Timeout: 20 minutes (AAP install + Liberty startup)"
+      set -e
+      echo "Triggering AAP dynamic inventory sync..."
 
-      ATTEMPTS=0
-      MAX_ATTEMPTS=80  # 80 × 15s = 20 minutes
+      curl -s --insecure --request POST \
+        --header "Authorization: Bearer $${AAP_TOKEN}" \
+        --header "Content-Type: application/json" \
+        "${var.aap_hostname}/api/controller/v2/inventory_sources/${var.aap_inventory_id}/sync/"
 
-      until [ $ATTEMPTS -ge $MAX_ATTEMPTS ]; do
-        STATE=$(aws elbv2 describe-target-health \
-          --target-group-arn ${aws_lb_target_group.liberty_base.arn} \
-          --targets Id=${aws_instance.liberty_base_host.id} \
-          --region ${var.aws_region} \
-          --query 'TargetHealthDescriptions[0].TargetHealth.State' \
-          --output text)
+      echo "Waiting for inventory sync to complete..."
 
-        ELAPSED=$((ATTEMPTS * 15))
-        echo "[$${ELAPSED}s elapsed] Target health: $STATE"
+      while true; do
+        SYNC_STATUS=$(curl -s --insecure \
+          --header "Authorization: Bearer $${AAP_TOKEN}" \
+          "${var.aap_hostname}/api/controller/v2/inventory_sources/${var.aap_inventory_id}/" \
+          | jq -r '.status')
 
-        if [ "$STATE" = "healthy" ]; then
-          echo "Instance healthy after $${ELAPSED}s — old instance safe to destroy"
-          exit 0
-        fi
+        echo "Inventory sync status: $SYNC_STATUS"
 
-        ATTEMPTS=$((ATTEMPTS + 1))
-        sleep 15
+        case "$SYNC_STATUS" in
+          successful)
+            echo "Inventory sync complete"
+            break
+            ;;
+          failed|error)
+            echo "Inventory sync failed"
+            exit 1
+            ;;
+        esac
+        sleep 10
       done
+    EOT
 
-      echo "ERROR: Instance did not become healthy within 20 minutes"
-      exit 1
+    environment = {
+      AAP_TOKEN = var.aap_token
+    }
+  }
+
+  depends_on = [aws_instance.liberty_base]
+
+  # Action trigger fires the AAP job after inventory sync completes
+  lifecycle {
+    action_trigger {
+      events  = [after_create, after_update]
+      actions = [action.aap_job_launch.current_version_playbook_ssm]
+    }
+  }
+}
+
+# -----------------------------------------------------------------------------
+# Step 2: Post-job -- validate Liberty is healthy behind the ALB
+# Nothing should depend on the liberty-base instance being ready until
+# this resource is satisfied
+# -----------------------------------------------------------------------------
+
+resource "null_resource" "liberty_base_post_job" {
+  triggers = {
+    instance_id = aws_instance.liberty_base.id
+    ami_id      = data.hcp_packer_artifact.al2023_demo.external_identifier
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -e
+      echo "Waiting for liberty-base instance to be healthy behind ALB..."
+
+      aws elbv2 wait target-in-service \
+        --target-group-arn ${aws_lb_target_group.liberty_base.arn} \
+        --region ${var.aws_region}
+
+      echo "Liberty is healthy -- deployment complete"
     EOT
   }
 
-  depends_on = [aws_instance.liberty_base_host]
+  # This resource only runs after the pre-job resource completes
+  # which means after the action trigger has fired the AAP job
+  # The implicit assumption is that by the time Terraform evaluates
+  # this resource, the AAP job has had time to run. If you need a
+  # harder guarantee, see the note below.
+  depends_on = [null_resource.liberty_base_pre_job]
 }

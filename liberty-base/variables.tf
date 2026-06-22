@@ -40,6 +40,17 @@ variable "ec2_instance_ami_name" {
 # leaving them as empty strings or zeroes. See README for details.
 # ------------------------------------------------------------
 
+variable "aap_hostname" {
+  type        = string
+  description = "The hostname or IP address of the AAP instance managing the inventory and job templates. Used for informational purposes in host variables, but not required for connectivity."
+}
+
+variable "aap_token" {
+  type        = string
+  sensitive   = true
+  description = "The API token for authenticating to the AAP instance. Required for the Lambda function to trigger Ansible playbook runs, but can be left empty if not using that feature."
+}
+
 variable "aap_agent_cidr" {
   type        = string
   description = "The CIDR block representing the network location of the AAP agent(s) that will connect to the EC2 instance. This is used to scope the security group ingress rule allowing SSH access from the AAP agent(s). For example, if the AAP agent is running on a machine with IP address 192.168.1.100, the CIDR block would be 192.168.1.100/32."
