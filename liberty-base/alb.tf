@@ -58,7 +58,7 @@ resource "aws_lb_target_group_attachment" "liberty_base" {
 
   # Terraform won't detach (and therefore won't allow destroy of old instance)
   # until the new instance is confirmed healthy
-  depends_on = [null_resource.liberty_base_post_job]
+  depends_on = [null_resource.liberty_base_pre_job]
 }
 
 # --- ALB Listener — HTTP → Liberty ---
@@ -89,20 +89,29 @@ resource "null_resource" "liberty_base_pre_job" {
   provisioner "local-exec" {
     command = <<-EOT
       set -e
+
       echo "Triggering AAP dynamic inventory sync..."
 
-      curl -s --insecure --request POST \
+    SYNC_RESPONSE=$(curl -s --insecure --request POST \
         --header "Authorization: Bearer $${AAP_TOKEN}" \
         --header "Content-Type: application/json" \
-        "${var.aap_hostname}/api/controller/v2/inventory_sources/${var.aap_inventory_id}/sync/"
+        "${var.aap_hostname}/api/controller/v2/inventory_sources/${var.aap_inventory_id}/update/")
 
-      echo "Waiting for inventory sync to complete..."
+      echo "Sync trigger response: $SYNC_RESPONSE"
+
+      # Give AAP a moment to transition out of the initial pending state
+      sleep 5
+
+      echo "Polling for inventory sync completion..."
 
       while true; do
-        SYNC_STATUS=$(curl -s --insecure \
-          --header "Authorization: Bearer $${AAP_TOKEN}" \
-          "${var.aap_hostname}/api/controller/v2/inventory_sources/${var.aap_inventory_id}/" \
-          | jq -r '.status')
+        FULL_RESPONSE=$(curl -s --insecure \
+        --header "Authorization: Bearer $${AAP_TOKEN}" \
+        "${var.aap_hostname}/api/controller/v2/inventory_sources/${var.aap_inventory_id}/")
+
+        echo "Full response: $FULL_RESPONSE"
+
+        SYNC_STATUS=$(echo "$FULL_RESPONSE" | jq -r '.status')
 
         echo "Inventory sync status: $SYNC_STATUS"
 
@@ -112,8 +121,14 @@ resource "null_resource" "liberty_base_pre_job" {
             break
             ;;
           failed|error)
-            echo "Inventory sync failed"
+            echo "Inventory sync failed -- check AAP inventory source logs"
             exit 1
+            ;;
+          null)
+            echo "Unexpected null status -- AAP may still be initializing, retrying..."
+            ;;
+          *)
+            echo "Sync in progress (status: $SYNC_STATUS), waiting..."
             ;;
         esac
         sleep 10
@@ -127,7 +142,6 @@ resource "null_resource" "liberty_base_pre_job" {
 
   depends_on = [aws_instance.liberty_base_host]
 
-  # Action trigger fires the AAP job after inventory sync completes
   lifecycle {
     action_trigger {
       events  = [after_create, after_update]
@@ -161,10 +175,7 @@ resource "null_resource" "liberty_base_post_job" {
     EOT
   }
 
-  # This resource only runs after the pre-job resource completes
-  # which means after the action trigger has fired the AAP job
-  # The implicit assumption is that by the time Terraform evaluates
-  # this resource, the AAP job has had time to run. If you need a
-  # harder guarantee, see the note below.
-  depends_on = [null_resource.liberty_base_pre_job]
+  # Attachment must exist before we poll -- no target registered means
+  # wait target-in-service has nothing to evaluate and polls forever
+  depends_on = [aws_lb_target_group_attachment.liberty_base]
 }
