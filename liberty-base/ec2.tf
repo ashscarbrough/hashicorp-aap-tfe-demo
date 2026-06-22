@@ -33,41 +33,6 @@ resource "aws_secretsmanager_secret_version" "liberty_base_host_private_key" {
 # - subnet_id can now be a private subnet if you have one; SSM doesn't need
 #   a public IP as long as you have a VPC endpoint or NAT gateway
 resource "aws_instance" "liberty_base_host" {
-  ami           = data.hcp_packer_artifact.liberty_base_image.external_identifier
-  instance_type = var.ec2_instance_type
-  key_name      = var.connect_via_session_manager ? null : aws_key_pair.liberty_base_key_pair[0].key_name
-
-  user_data = file("${path.module}/scripts/rhel9-userdata.sh")
-  monitoring = true
-
-  iam_instance_profile = aws_iam_instance_profile.liberty_base_instance_profile.name
-
-  # Instance no longer needs a public IP — ALB handles public ingress.
-  # SSM connectivity works via VPC endpoint or NAT; does not require public IP.
-  associate_public_ip_address = false
-  subnet_id                   = var.ec2_subnet_id
-  vpc_security_group_ids      = [aws_security_group.liberty_base_instance_sg.id]
-
-  lifecycle {
-    create_before_destroy = true
-    replace_triggered_by  = [null_resource.ami_version_tracker]
-
-    action_trigger {
-      events  = [after_create, after_update]
-      actions = [action.aap_workflow_job_launch.current_version_playbook_ssm]
-    }
-  }
-
-  tags = {
-    Name           = var.ec2_instance_name
-    ManagedBy      = "terraform"
-    AnsibleManaged = "true"
-    DeploymentPath = "liberty-base"
-    AMIVersion     = data.hcp_packer_artifact.liberty_base_image.external_identifier
-  }
-}
-
-resource "aws_instance" "liberty_base_host" {
   ami                         = data.hcp_packer_artifact.liberty_base_image.external_identifier
   instance_type               = var.ec2_instance_type
   key_name                    = var.connect_via_session_manager ? null : aws_key_pair.liberty_base_key_pair[0].key_name
