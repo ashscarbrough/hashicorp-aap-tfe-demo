@@ -66,3 +66,60 @@ resource "aws_instance" "liberty_base_host" {
     AMIVersion     = data.hcp_packer_artifact.liberty_base_image.external_identifier
   }
 }
+
+resource "aws_instance" "liberty_base_host" {
+  ami                         = data.hcp_packer_artifact.liberty_base_image.external_identifier
+  instance_type               = var.ec2_instance_type
+  key_name                    = var.connect_via_session_manager ? null : aws_key_pair.liberty_base_key_pair[0].key_name
+  user_data                   = file("${path.module}/scripts/rhel9-userdata.sh")
+  monitoring                  = true
+  associate_public_ip_address = false
+  subnet_id                   = var.ec2_subnet_id
+  vpc_security_group_ids      = [aws_security_group.liberty_base_instance_sg.id]
+  iam_instance_profile        = aws_iam_instance_profile.liberty_base_ec2_instance_profile.name
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -e
+      echo "Waiting for instance SSM registration before firing AAP job..."
+
+      for i in $(seq 1 20); do
+        STATUS=$(aws ssm describe-instance-information \
+          --filters "Key=InstanceIds,Values=${self.id}" \
+          --query 'InstanceInformationList[0].PingStatus' \
+          --region ${var.aws_region} \
+          --output text 2>/dev/null || echo "None")
+
+        echo "Attempt $i/20 -- SSM status: $STATUS"
+
+        if [ "$STATUS" = "Online" ]; then
+          echo "Instance ${self.id} is SSM-registered and ready"
+          exit 0
+        fi
+        sleep 15
+      done
+
+      echo "Timed out waiting for SSM registration after 5 minutes"
+      exit 1
+    EOT
+  }
+
+  tags = {
+    Name           = var.ec2_instance_name
+    ManagedBy      = "terraform"
+    AnsibleManaged = "true"
+    AMIVersion     = data.hcp_packer_artifact.liberty_base_image.external_identifier
+    DeploymentPath = "liberty-base"
+    Environment    = "demo"
+    Project        = "aap-tfe-al2023-demo"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+    replace_triggered_by  = [null_resource.ami_version_tracker]
+    action_trigger {
+      events  = [after_create, after_update]
+      actions = [action.aap_workflow_job_launch.current_version_playbook_ssm]
+    }
+  }
+}
