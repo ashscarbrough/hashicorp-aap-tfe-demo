@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# IAM resources for AL2023 demo
+# IAM resources for Liberty-base demo
 # ------------------------------------------------------------------------------
 
 resource "aws_iam_role_policy_attachment" "ssm_managed_instance_core" {

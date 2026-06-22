@@ -40,6 +40,8 @@ resource "aws_instance" "liberty_base_host" {
   user_data = file("${path.module}/scripts/rhel9-userdata.sh")
   monitoring = true
 
+  iam_instance_profile = aws_iam_instance_profile.liberty_base_instance_profile.name
+
   # Instance no longer needs a public IP — ALB handles public ingress.
   # SSM connectivity works via VPC endpoint or NAT; does not require public IP.
   associate_public_ip_address = false
