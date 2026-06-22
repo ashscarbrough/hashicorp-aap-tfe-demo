@@ -52,7 +52,7 @@ resource "aws_instance" "liberty_base_host" {
 
     action_trigger {
       events  = [after_create, after_update]
-      actions = [action.aap_job_launch.current_version_playbook_ssm]
+      actions = [action.aap_workflow_job_launch.current_version_playbook_ssm]
     }
   }
 
