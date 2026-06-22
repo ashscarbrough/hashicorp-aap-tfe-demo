@@ -17,6 +17,7 @@ action "aap_workflow_job_launch" "current_version_playbook_ssm" {
       alb_dns_name                 = aws_lb.liberty_base.dns_name
       ansible_python_interpreter   = "/usr/bin/python3"
       ansible_user                 = "ssm-user"
+      liberty_server_name          = "liberty-base"
     })
   }
 }
@@ -35,6 +36,7 @@ action "aap_workflow_job_launch" "previous_version_rollback_playbook" {
       alb_dns_name                 = aws_lb.liberty_base.dns_name
       ansible_python_interpreter   = "/usr/bin/python3"
       ansible_user                 = "ssm-user"
+      liberty_server_name          = "liberty-base"
     })
   }
 }
