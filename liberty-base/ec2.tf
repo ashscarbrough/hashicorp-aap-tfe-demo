@@ -60,6 +60,7 @@ resource "aws_instance" "liberty_base_host" {
     Name           = var.ec2_instance_name
     ManagedBy      = "terraform"
     AnsibleManaged = "true"
+    DeploymentPath = "liberty-base"
     AMIVersion     = data.hcp_packer_artifact.liberty_base_image.external_identifier
   }
 }
