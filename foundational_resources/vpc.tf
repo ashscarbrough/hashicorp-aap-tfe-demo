@@ -20,6 +20,8 @@ module "vpc" {
   enable_dns_support   = true
   enable_dns_hostnames = true
 
+  map_public_ip_on_launch = true
+
   default_network_acl_egress = [{
     "action" : "allow",
     "cidr_block" : "0.0.0.0/0",

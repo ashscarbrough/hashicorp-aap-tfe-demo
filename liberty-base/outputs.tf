@@ -30,3 +30,8 @@ output "liberty_base_url" {
   description = "Stable ALB URL for the liberty-base demo instance"
   value       = "http://${aws_lb.liberty_base.dns_name}/liberty-demo"
 }
+
+output "alb_dns_name" {
+  description = "DNS name of the ALB in the liberty-base demo, which is used as the application endpoint and passed to Ansible for configuration."
+  value       = aws_lb.liberty_app_alb.dns_name
+}
