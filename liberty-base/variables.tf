@@ -62,8 +62,8 @@ variable "aap_agent_cidr" {
   }
 }
 
-variable "aap_inventory_id" {
-  description = "ID of the AAP inventory to add the host to"
+variable "aap_inventory_source_id" {
+  description = "ID of the AAP inventory source to add the host to"
   type        = number
 }
 

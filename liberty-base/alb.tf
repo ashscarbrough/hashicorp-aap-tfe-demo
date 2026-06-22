@@ -95,7 +95,7 @@ resource "null_resource" "liberty_base_pre_job" {
     SYNC_RESPONSE=$(curl -s --insecure --request POST \
         --header "Authorization: Bearer $${AAP_TOKEN}" \
         --header "Content-Type: application/json" \
-        "${var.aap_hostname}/api/controller/v2/inventory_sources/${var.aap_inventory_id}/update/")
+        "${var.aap_hostname}/api/controller/v2/inventory_sources/${var.aap_inventory_source_id}/update/")
 
       echo "Sync trigger response: $SYNC_RESPONSE"
 
@@ -107,7 +107,7 @@ resource "null_resource" "liberty_base_pre_job" {
       while true; do
         FULL_RESPONSE=$(curl -s --insecure \
         --header "Authorization: Bearer $${AAP_TOKEN}" \
-        "${var.aap_hostname}/api/controller/v2/inventory_sources/${var.aap_inventory_id}/")
+        "${var.aap_hostname}/api/controller/v2/inventory_sources/${var.aap_inventory_source_id}/")
 
         echo "Full response: $FULL_RESPONSE"
 
