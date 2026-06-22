@@ -41,7 +41,7 @@ resource "aws_instance" "liberty_base_host" {
   associate_public_ip_address = false
   subnet_id                   = var.ec2_subnet_id
   vpc_security_group_ids      = [aws_security_group.liberty_base_instance_sg.id]
-  iam_instance_profile        = aws_iam_instance_profile.liberty_base_ec2_instance_profile.name
+  iam_instance_profile        = aws_iam_instance_profile.liberty_base_instance_profile.name
 
   provisioner "local-exec" {
     command = <<-EOT
