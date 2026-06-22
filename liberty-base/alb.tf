@@ -83,7 +83,7 @@ resource "aws_lb_listener" "liberty_base_http" {
 resource "null_resource" "liberty_base_pre_job" {
   triggers = {
     instance_id = aws_instance.liberty_base_host.id
-    ami_id      = data.hcp_packer_artifact.liberty_base.external_identifier
+    ami_id      = data.hcp_packer_artifact.liberty_base_image.external_identifier
   }
 
   provisioner "local-exec" {
@@ -145,7 +145,7 @@ resource "null_resource" "liberty_base_pre_job" {
 resource "null_resource" "liberty_base_post_job" {
   triggers = {
     instance_id = aws_instance.liberty_base_host.id
-    ami_id      = data.hcp_packer_artifact.liberty_base.external_identifier
+    ami_id      = data.hcp_packer_artifact.liberty_base_image.external_identifier
   }
 
   provisioner "local-exec" {
