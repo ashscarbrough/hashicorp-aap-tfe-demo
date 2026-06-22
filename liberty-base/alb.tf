@@ -71,33 +71,3 @@ resource "aws_lb_listener" "liberty_base_http" {
     target_group_arn = aws_lb_target_group.liberty_base.arn
   }
 }
-
-# -----------------------------------------------------------------------------
-# Post-job -- validate Liberty is healthy behind the ALB
-# Nothing should depend on the liberty-base instance being ready until
-# this resource is satisfied
-# -----------------------------------------------------------------------------
-
-resource "null_resource" "liberty_base_post_job" {
-  triggers = {
-    instance_id = aws_instance.liberty_base_host.id
-    ami_id      = data.hcp_packer_artifact.liberty_base_image.external_identifier
-  }
-
-  provisioner "local-exec" {
-    command = <<-EOT
-      set -e
-      echo "Waiting for liberty-base instance to be healthy behind ALB..."
-
-      aws elbv2 wait target-in-service \
-        --target-group-arn ${aws_lb_target_group.liberty_base.arn} \
-        --region ${var.aws_region}
-
-      echo "Liberty is healthy -- deployment complete"
-    EOT
-  }
-
-  # Attachment must exist before we poll -- no target registered means
-  # wait target-in-service has nothing to evaluate and polls forever
-  depends_on = [aws_lb_target_group_attachment.liberty_base]
-}
