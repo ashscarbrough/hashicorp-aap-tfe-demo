@@ -16,4 +16,4 @@ hostnamectl set-hostname liberty-mutable-demo
 # via SSM run command before triggering the AAP job
 touch /tmp/userdata-complete
 
-echo "=== User data complete ==="
+echo "==== User data complete ===="
