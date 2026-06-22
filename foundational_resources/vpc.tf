@@ -126,3 +126,17 @@ resource "aws_vpc_endpoint" "ec2messages" {
     Name = "ec2messages"
   }
 }
+
+resource "aws_vpc_endpoint" "cloudwatch_logs" {
+  vpc_id              = module.vpc.vpc_id
+  service_name        = "com.amazonaws.${data.aws_region.current.region}.logs"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = module.vpc.private_subnets
+  security_group_ids  = [aws_security_group.ssm_endpoints.id]
+  private_dns_enabled = true
+
+  tags = {
+    Name      = "enterprise-demo-vpc-logs-endpoint"
+    ManagedBy = "terraform"
+  }
+}

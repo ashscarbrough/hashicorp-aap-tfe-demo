@@ -1,5 +1,5 @@
 # Read the latest artifact from HCP Packer channel
-data "hcp_packer_artifact" "liberty_base_demo" {
+data "hcp_packer_artifact" "liberty_app_demo" {
   bucket_name  = var.hcp_packer_bucket_name
   channel_name = var.hcp_packer_channel_name
   platform     = "aws"
@@ -8,6 +8,6 @@ data "hcp_packer_artifact" "liberty_base_demo" {
 
 resource "null_resource" "ami_version_tracker" {
   triggers = {
-    ami_id = data.hcp_packer_artifact.al2023_demo.external_identifier
+    ami_id = data.hcp_packer_artifact.liberty_app_demo.external_identifier
   }
 }
