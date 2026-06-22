@@ -13,7 +13,7 @@ action "aap_workflow_job_launch" "current_version_playbook_ssm" {
     extra_vars = jsonencode({
       ssm_instance_id              = aws_instance.liberty_base_host.id
       aws_region                   = var.aws_region
-      aap_alb_dns_name             = aws_lb.liberty_app_alb.dns_name
+      aap_alb_dns_name             = aws_lb.liberty_base.dns_name
       ansible_python_interpreter   = "/usr/bin/python3"
       ansible_user                 = "ssm-user"
     })
@@ -30,7 +30,7 @@ action "aap_workflow_job_launch" "previous_version_rollback_playbook" {
     extra_vars = jsonencode({
       ssm_instance_id              = aws_instance.liberty_base_host.id
       aws_region                   = var.aws_region
-      aap_alb_dns_name             = aws_lb.liberty_app_alb.dns_name
+      aap_alb_dns_name             = aws_lb.liberty_base.dns_name
       ansible_python_interpreter   = "/usr/bin/python3"
       ansible_user                 = "ssm-user"
     })
