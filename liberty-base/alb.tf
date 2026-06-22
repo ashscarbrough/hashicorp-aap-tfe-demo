@@ -87,65 +87,60 @@ resource "null_resource" "liberty_base_pre_job" {
   }
 
     provisioner "local-exec" {
-        command = <<-EOT
-            set -e
+    command = <<-EOT
+        set -e
 
-            echo "Triggering AAP dynamic inventory sync..."
+        echo "Triggering AAP dynamic inventory sync..."
 
-            SYNC_RESPONSE=$(curl -s --insecure --request POST \
+        SYNC_RESPONSE=$(curl -s --insecure --request POST \
+        --header "Authorization: Bearer $${AAP_TOKEN}" \
+        --header "Content-Type: application/json" \
+        "${var.aap_hostname}/api/controller/v2/inventory_sources/${var.aap_inventory_source_id}/update/")
+
+        # Extract the update job ID using grep to avoid jq choking on
+        # multiline source_vars embedded in the trigger response
+        UPDATE_ID=$(echo "$SYNC_RESPONSE" | grep -o '"inventory_update":[0-9]*' | grep -o '[0-9]*')
+
+        if [ -z "$UPDATE_ID" ]; then
+        echo "Failed to get inventory update job ID -- response: $SYNC_RESPONSE"
+        exit 1
+        fi
+
+        echo "Polling inventory update job $UPDATE_ID for completion..."
+
+        while true; do
+        JOB_RESPONSE=$(curl -s --insecure \
             --header "Authorization: Bearer $${AAP_TOKEN}" \
-            --header "Content-Type: application/json" \
-            "${var.aap_hostname}/api/controller/v2/inventory_sources/${var.aap_inventory_source_id}/update/")
+            "${var.aap_hostname}/api/controller/v2/inventory_updates/$${UPDATE_ID}/")
 
-            echo "Sync trigger response: $SYNC_RESPONSE"
+        # Same issue exists on the job response -- extract status with grep
+        SYNC_STATUS=$(echo "$JOB_RESPONSE" | grep -o '"status":"[^"]*"' | head -1 | grep -o ':[^}]*' | tr -d ':"')
 
-            # Extract the inventory update job ID from the trigger response
-            UPDATE_ID=$(echo "$SYNC_RESPONSE" | jq -r '.id')
+        echo "Inventory sync status: $SYNC_STATUS"
 
-            if [ -z "$UPDATE_ID" ] || [ "$UPDATE_ID" = "null" ]; then
-            echo "Failed to get inventory update job ID -- response: $SYNC_RESPONSE"
+        case "$SYNC_STATUS" in
+            successful)
+            echo "Inventory sync complete"
+            break
+            ;;
+            failed|error)
+            echo "Inventory sync failed -- check AAP inventory source logs"
             exit 1
-            fi
+            ;;
+            pending|waiting|running)
+            echo "Sync in progress (status: $SYNC_STATUS), waiting..."
+            ;;
+            *)
+            echo "Unexpected status: $SYNC_STATUS -- retrying..."
+            ;;
+        esac
+        sleep 10
+        done
+    EOT
 
-            echo "Polling inventory update job $UPDATE_ID for completion..."
-
-            while true; do
-            JOB_RESPONSE=$(curl -s --insecure \
-                --header "Authorization: Bearer $${AAP_TOKEN}" \
-                "${var.aap_hostname}/api/controller/v2/inventory_updates/$${UPDATE_ID}/")
-
-            SYNC_STATUS=$(echo "$JOB_RESPONSE" | jq -r '.status')
-
-            echo "Inventory sync status: $SYNC_STATUS"
-
-            case "$SYNC_STATUS" in
-                successful)
-                echo "Inventory sync complete"
-                break
-                ;;
-                failed|error)
-                echo "Inventory sync failed -- check AAP inventory source logs"
-                exit 1
-                ;;
-                null)
-                ERROR=$(echo "$JOB_RESPONSE" | jq -r '.detail // empty')
-                if [ -n "$ERROR" ]; then
-                    echo "AAP API error: $ERROR"
-                    exit 1
-                fi
-                echo "Unexpected null status -- retrying..."
-                ;;
-                *)
-                echo "Sync in progress (status: $SYNC_STATUS), waiting..."
-                ;;
-            esac
-            sleep 10
-            done
-        EOT
-
-        environment = {
-            AAP_TOKEN = var.aap_token
-        }
+    environment = {
+        AAP_TOKEN = var.aap_token
+    }
     }
 
   depends_on = [aws_instance.liberty_base_host]
