@@ -58,7 +58,7 @@ resource "aws_lb_target_group_attachment" "liberty_base" {
 
   # Terraform won't detach (and therefore won't allow destroy of old instance)
   # until the new instance is confirmed healthy
-  depends_on = [null_resource.wait_for_alb_healthy]
+  depends_on = [null_resource.liberty_base_post_job]
 }
 
 # --- ALB Listener — HTTP → Liberty ---
@@ -82,8 +82,8 @@ resource "aws_lb_listener" "liberty_base_http" {
 
 resource "null_resource" "liberty_base_pre_job" {
   triggers = {
-    instance_id = aws_instance.liberty_base.id
-    ami_id      = data.hcp_packer_artifact.al2023_demo.external_identifier
+    instance_id = aws_instance.liberty_base_host.id
+    ami_id      = data.hcp_packer_artifact.liberty_base.external_identifier
   }
 
   provisioner "local-exec" {
@@ -125,7 +125,7 @@ resource "null_resource" "liberty_base_pre_job" {
     }
   }
 
-  depends_on = [aws_instance.liberty_base]
+  depends_on = [aws_instance.liberty_base_host]
 
   # Action trigger fires the AAP job after inventory sync completes
   lifecycle {
@@ -144,8 +144,8 @@ resource "null_resource" "liberty_base_pre_job" {
 
 resource "null_resource" "liberty_base_post_job" {
   triggers = {
-    instance_id = aws_instance.liberty_base.id
-    ami_id      = data.hcp_packer_artifact.al2023_demo.external_identifier
+    instance_id = aws_instance.liberty_base_host.id
+    ami_id      = data.hcp_packer_artifact.liberty_base.external_identifier
   }
 
   provisioner "local-exec" {
