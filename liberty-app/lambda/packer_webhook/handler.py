@@ -15,7 +15,7 @@ def lambda_handler(event, context):
     tfe_token        = os.environ["TFE_TOKEN"]
     tfe_url          = "https://app.terraform.io"
     channel_filter   = os.environ.get("PACKER_CHANNEL_FILTER", "production")
-    bucket_filter    = os.environ.get("PACKER_BUCKET_FILTER", "liberty-base")
+    bucket_filter    = os.environ.get("PACKER_BUCKET_FILTER", "liberty-app")
 
     # Parse the incoming HCP Packer event
     try:

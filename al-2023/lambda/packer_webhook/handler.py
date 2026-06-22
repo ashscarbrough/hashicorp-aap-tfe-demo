@@ -15,6 +15,7 @@ def lambda_handler(event, context):
     tfe_token        = os.environ["TFE_TOKEN"]
     tfe_url          = "https://app.terraform.io"
     channel_filter   = os.environ.get("PACKER_CHANNEL_FILTER", "production")
+    bucket_filter    = os.environ.get("PACKER_BUCKET_FILTER", "packer-demo-al2023")
 
     # Parse the incoming HCP Packer event
     try:
@@ -26,8 +27,24 @@ def lambda_handler(event, context):
         body = {}
         event_action = "unknown"
 
+    event_payload = body.get("event_payload", {})
+
+    # Extract bucket name from event_payload.bucket.name
+    bucket_name = event_payload.get("bucket", {}).get("name", "")
+    logger.info(f"HCP Packer bucket: '{bucket_name}' (filter: '{bucket_filter}')")
+
+    # Only proceed for the configured bucket
+    if bucket_name != bucket_filter:
+        logger.info(f"Skipping run — bucket '{bucket_name}' does not match filter '{bucket_filter}'")
+        return {
+            "statusCode": 200,
+            "body": json.dumps({
+                "message": f"Skipped — bucket '{bucket_name}' is not '{bucket_filter}'"
+            })
+        }
+
     # Extract channel name from event_payload.channel.name
-    channel_name = body.get("event_payload", {}).get("channel", {}).get("name", "")
+    channel_name = event_payload.get("channel", {}).get("name", "")
     logger.info(f"HCP Packer channel: '{channel_name}' (filter: '{channel_filter}')")
 
     # Only proceed for the configured channel
@@ -44,7 +61,7 @@ def lambda_handler(event, context):
     run_payload = json.dumps({
         "data": {
             "attributes": {
-                "message": f"Triggered by HCP Packer webhook — event: {event_action}",
+                "message": f"Triggered by HCP Packer webhook — bucket: {bucket_name}, channel: {channel_name}, event: {event_action}",
                 "auto-apply": True
             },
             "type": "runs",
@@ -80,7 +97,9 @@ def lambda_handler(event, context):
                 "statusCode": 200,
                 "body": json.dumps({
                     "message": "Terraform run triggered successfully",
-                    "run_id": run_id
+                    "run_id": run_id,
+                    "bucket": bucket_name,
+                    "channel": channel_name
                 })
             }
 

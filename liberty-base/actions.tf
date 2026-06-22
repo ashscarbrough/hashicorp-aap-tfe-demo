@@ -10,6 +10,7 @@ action "aap_workflow_job_launch" "current_version_playbook_ssm" {
   config {
     workflow_job_template_id     = var.aap_current_app_version_job_template_id
     wait_for_completion = true
+    wait_for_completion_timeout_seconds = 1800 # 30 minute timeout for playbook completion, adjust as needed
     extra_vars = jsonencode({
       ssm_instance_id              = aws_instance.liberty_base_host.id
       aws_region                   = var.aws_region
@@ -27,6 +28,7 @@ action "aap_workflow_job_launch" "previous_version_rollback_playbook" {
   config {
     workflow_job_template_id     = var.aap_previous_version_rollback_job_template_id
     wait_for_completion = true
+    wait_for_completion_timeout_seconds = 1800
     extra_vars = jsonencode({
       ssm_instance_id              = aws_instance.liberty_base_host.id
       aws_region                   = var.aws_region

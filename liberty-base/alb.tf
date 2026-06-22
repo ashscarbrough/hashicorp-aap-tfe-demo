@@ -31,7 +31,7 @@ resource "aws_lb_target_group" "liberty_base" {
 
   health_check {
     enabled             = true
-    path                = "/liberty-demo/health"
+    path                = "/liberty-base/health"
     port                = "traffic-port"
     protocol            = "HTTP"
     healthy_threshold   = 2

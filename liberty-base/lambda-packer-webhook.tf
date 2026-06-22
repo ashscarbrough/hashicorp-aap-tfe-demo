@@ -11,7 +11,7 @@ data "archive_file" "packer_webhook" {
 
 # IAM role for Lambda
 resource "aws_iam_role" "packer_webhook_lambda" {
-  name = "hcp-packer-al2023-webhook-lambda-role"
+  name = "hcp-packer-liberty-base-webhook-lambda-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -32,7 +32,7 @@ resource "aws_iam_role_policy_attachment" "packer_webhook_lambda_logs" {
 
 # Lambda function
 resource "aws_lambda_function" "packer_webhook" {
-  function_name    = "hcp-packer-al2023-webhook"
+  function_name    = "hcp-packer-liberty-base-webhook"
   filename         = data.archive_file.packer_webhook.output_path
   source_code_hash = data.archive_file.packer_webhook.output_base64sha256
   role             = aws_iam_role.packer_webhook_lambda.arn
@@ -42,6 +42,7 @@ resource "aws_lambda_function" "packer_webhook" {
 
   environment {
     variables = {
+      TARGET_BUCKET          = "liberty-base"
       TFE_WORKSPACE_ID       = var.tfe_workspace_id
       TFE_TOKEN              = var.tfe_trigger_token
       PACKER_CHANNEL_FILTER  = var.hcp_packer_channel_name
