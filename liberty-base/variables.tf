@@ -135,6 +135,28 @@ variable "ec2_instance_profile_name" {
 }
 
 # ------------------------------------------------------------
+# ASG variables
+# ------------------------------------------------------------
+
+variable "asg_desired_capacity" {
+  description = "The desired number of EC2 instances in the Auto Scaling Group."
+  type        = number
+  default     = 1
+}
+
+variable "asg_min_size" {
+  description = "The minimum number of EC2 instances in the Auto Scaling Group."
+  type        = number
+  default     = 1
+}
+
+variable "asg_max_size" {
+  description = "The maximum number of EC2 instances in the Auto Scaling Group."
+  type        = number
+  default     = 1
+}
+
+# ------------------------------------------------------------
 # HCP Packer variables
 # ------------------------------------------------------------
 

@@ -22,8 +22,7 @@ resource "aws_lambda_function" "liberty_app_asg_lifecycle_hook" {
     variables = {
       AAP_HOST               = var.aap_hostname
       AAP_TOKEN              = var.aap_token
-      AAP_JOB_TEMPLATE_ID    = var.aap_job_template_id
-      AAP_INVENTORY_SOURCE_ID = var.asg_aap_inventory_id
+      AAP_JOB_TEMPLATE_ID    = var.aap_configuration_job_template_id
     }
   }
 }
