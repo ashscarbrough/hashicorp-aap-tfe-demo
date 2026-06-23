@@ -15,13 +15,7 @@ data "aws_ssm_parameter" "liberty_base_deployment" {
 
 output "deployment_summary" {
   description = "Liberty-base deployment metadata written by AAP at deploy/rollback time"
-  value = {
-    app_version       = nonsensitive(data.aws_ssm_parameter.app_version.value)
-    liberty_version   = nonsensitive(data.aws_ssm_parameter.liberty_version.value)
-    aap_job_id        = nonsensitive(data.aws_ssm_parameter.aap_job_id.value)
-    deployment_status = nonsensitive(data.aws_ssm_parameter.deployment_status.value)
-    deployed_at       = nonsensitive(data.aws_ssm_parameter.deployed_at.value)
-  }
+  value       = nonsensitive(data.aws_ssm_parameter.liberty_base_deployment.value)
 }
 
 output "security_group_ids" {
