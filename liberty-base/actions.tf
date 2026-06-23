@@ -41,3 +41,20 @@ action "aap_workflow_job_launch" "previous_version_rollback_playbook" {
   }
 }
 
+
+# -------------------------------------------------------------
+# This action is used to install packages on the EC2 instance via an AAP job template.
+# The job template points at the package_install_custom.yml playbook, which installs
+# packages based on the list provided in the extra_vars. The list of packages is defined
+# in the variable packages_to_install, which is passed to the job template as a JSON-encoded string.
+# -------------------------------------------------------------
+action "aap_job_launch" "install_packages" {
+  config {
+    job_template_id     = 18
+    inventory_id        = var.aap_inventory_id
+    wait_for_completion = true
+    extra_vars = jsonencode({
+      packages = var.packages_to_install
+    })
+  }
+}
