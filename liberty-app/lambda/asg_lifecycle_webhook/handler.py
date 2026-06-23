@@ -203,7 +203,7 @@ def send_lifecycle_action(asg_name, hook_name, instance_id, action_token, action
         logger.error(f"Failed to complete lifecycle action: {e}")
         raise
 
-def wait_for_ssm(instance_id, max_attempts=20, interval=15):
+def wait_for_ssm(instance_id, max_attempts=30, interval=15):
     """Wait for instance to register with SSM before triggering AAP."""
     import boto3, time
     ssm = boto3.client("ssm", region_name=os.environ.get("AWS_REGION", "us-east-1"))
