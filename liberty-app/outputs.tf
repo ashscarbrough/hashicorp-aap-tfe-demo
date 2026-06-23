@@ -1,11 +1,10 @@
 locals {
   liberty_app_deployment_summary = {
-    app_version     = data.hcp_packer_artifact.liberty_app_image.labels["AppVersion"]
-    ami_version     = data.hcp_packer_artifact.liberty_app_image.labels["AmiVersion"]
-    liberty_version = data.hcp_packer_artifact.liberty_app_image.labels["LibertyVersion"]
+    app_version     = data.hcp_packer_artifact.liberty_app_image.labels["app-version"]
+    ami_version     = data.hcp_packer_artifact.liberty_app_image.labels["ami-version"]
+    liberty_version = data.hcp_packer_artifact.liberty_app_image.labels["liberty-version"]
     ami_id          = data.hcp_packer_artifact.liberty_app_image.external_identifier
-    image_type      = data.hcp_packer_artifact.liberty_app_image.labels["ImageType"]
-    build_time      = data.hcp_packer_artifact.liberty_app_image.labels["BuildTime"]
+    build_time      = data.hcp_packer_artifact.liberty_app_image.labels["build-time"]
     deploy_mode     = "immutable"
     packer_bucket   = var.hcp_packer_bucket_name
     packer_channel  = var.hcp_packer_channel_name
