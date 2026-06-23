@@ -1,24 +1,22 @@
 # Read deployment metadata written by AAP playbooks
 # Will be empty on first apply -- Terraform handles this gracefully
 # via the default value
-# data "aws_ssm_parameter" "liberty_base_deployment" {
-#   name            = "/liberty-demo/liberty-base/deployment"
-#   with_decryption = false
+data "aws_ssm_parameter" "liberty_base_deployment" {
+  name            = "/liberty-demo/liberty-base/deployment"
+  with_decryption = false
 
-#   # Do not fail if parameter doesn't exist yet (first apply before AAP has run)
-#   # Remove this lifecycle block once the parameter has been written at least once
-#   lifecycle {
-#     postcondition {
-#       condition     = self.value != ""
-#       error_message = "SSM parameter /liberty-demo/liberty-base/deployment is empty"
-#     }
-#   }
-# }
+  lifecycle {
+    postcondition {
+      condition     = self.value != ""
+      error_message = "SSM parameter /liberty-demo/liberty-base/deployment is empty"
+    }
+  }
+}
 
-# output "deployment_summary" {
-#   description = "Liberty-base deployment metadata written by AAP at deploy/rollback time"
-#   value       = data.aws_ssm_parameter.liberty_base_deployment.value
-# }
+output "deployment_summary" {
+  description = "Liberty-base deployment metadata written by AAP at deploy/rollback time"
+  value       = data.aws_ssm_parameter.liberty_base_deployment.value
+}
 
 output "security_group_ids" {
   description = "Map of security group IDs keyed by component: liberty_base."
