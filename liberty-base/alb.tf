@@ -9,7 +9,6 @@ resource "aws_lb" "liberty_base" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
 
-  # ALB requires subnets in at least two AZs
   subnets = var.alb_subnet_ids
 
   tags = {
@@ -19,9 +18,6 @@ resource "aws_lb" "liberty_base" {
 }
 
 # --- Target Group ---
-# Points at Liberty's HTTP port. ALB handles the public-facing TLS termination
-# so we talk plain HTTP to the instance — no need to deal with Liberty's
-# self-signed cert at the ALB layer.
 resource "aws_lb_target_group" "liberty_base" {
   name        = "${var.ec2_instance_name}-tg"
   port        = 9080
@@ -41,29 +37,29 @@ resource "aws_lb_target_group" "liberty_base" {
     matcher             = "200"
   }
 
-  # Shorter deregistration delay for demo — default 300s is painful to watch live
-  deregistration_delay = 240
+  # Deregistration delay is effectively irrelevant on single-instance
+  # create_before_destroy replacements since the old instance is destroyed
+  # immediately after the new one is stood up. Kept short for demo clarity.
+  deregistration_delay = 30
 
   tags = {
     Name      = "${var.ec2_instance_name}-tg"
     ManagedBy = "terraform"
   }
-
-  depends_on = [null_resource.liberty_base_aap_and_alb_gate]
 }
 
 # --- Target Group Attachment ---
+# Depends implicitly on aws_instance.liberty_base_host via target_id.
+# The instance lifecycle has wait_for_completion = true on its action_trigger
+# so by the time this attachment is created Liberty is already installed
+# and serving traffic -- the ALB health check passes almost immediately.
 resource "aws_lb_target_group_attachment" "liberty_base" {
   target_group_arn = aws_lb_target_group.liberty_base.arn
   target_id        = aws_instance.liberty_base_host.id
   port             = 9080
-
-  depends_on = [null_resource.liberty_base_aap_and_alb_gate]
 }
 
-# --- ALB Listener — HTTP → Liberty ---
-# For the demo, plain HTTP on port 80 forwarded to Liberty on 9080.
-# If you have an ACM cert, swap this for HTTPS and add an HTTP→HTTPS redirect.
+# --- ALB Listener ---
 resource "aws_lb_listener" "liberty_base_http" {
   load_balancer_arn = aws_lb.liberty_base.arn
   port              = 80
