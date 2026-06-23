@@ -103,7 +103,7 @@ resource "aws_iam_user_policy" "aap_ssm_sessions" {
           "ssm:GetParameters",
           "ssm:DeleteParameter"
         ]
-        Resource = "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/liberty*"
+        Resource = "*"
       },
     ]
   })
