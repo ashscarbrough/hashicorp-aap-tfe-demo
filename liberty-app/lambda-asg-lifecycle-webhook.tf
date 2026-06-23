@@ -36,7 +36,6 @@ resource "aws_lambda_function" "liberty_app_asg_lifecycle_webhook" {
       AAP_TOKEN           = var.aap_token
       AAP_JOB_TEMPLATE_ID = var.aap_configuration_job_template_id
       AAP_INVENTORY_ID    = var.aap_inventory_id
-      AWS_REGION          = var.aws_region
     }
   }
 

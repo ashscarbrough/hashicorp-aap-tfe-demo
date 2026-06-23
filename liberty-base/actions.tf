@@ -18,6 +18,9 @@ action "aap_workflow_job_launch" "current_version_playbook_ssm" {
       ansible_python_interpreter   = "/usr/bin/python3"
       ansible_user                 = "ssm-user"
       liberty_server_name          = "liberty-base"
+      tfe_workspace_id             = var.tfe_workspace_id
+      tfe_token                    = var.tfe_trigger_token
+      app_version                  = "v1.2.0"
     })
   }
 }
@@ -37,6 +40,9 @@ action "aap_workflow_job_launch" "previous_version_rollback_playbook" {
       ansible_python_interpreter   = "/usr/bin/python3"
       ansible_user                 = "ssm-user"
       liberty_server_name          = "liberty-base"
+      tfe_workspace_id             = var.tfe_workspace_id
+      tfe_token                    = var.tfe_trigger_token
+      app_version                  = "v1.0.0"
     })
   }
 }

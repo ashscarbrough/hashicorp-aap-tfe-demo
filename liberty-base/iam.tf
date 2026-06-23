@@ -75,6 +75,17 @@ resource "aws_iam_role_policy" "ssm_session_logging" {
         ]
       },
       {
+        Sid    = "DeploymentMetadataWrite"
+        Effect = "Allow"
+        Action = [
+          "ssm:PutParameter",
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:DeleteParameter"
+        ]
+        Resource = "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/liberty-base-demo/*"
+      },
+      {
         Sid    = "CloudWatchSessionLogs"
         Effect = "Allow"
         Action = [

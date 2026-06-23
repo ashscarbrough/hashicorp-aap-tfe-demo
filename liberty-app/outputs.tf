@@ -1,3 +1,17 @@
+locals {
+  liberty_app_deployment_summary = {
+    app_version     = data.hcp_packer_artifact.liberty_app_image.labels["AppVersion"]
+    ami_version     = data.hcp_packer_artifact.liberty_app_image.labels["AmiVersion"]
+    liberty_version = data.hcp_packer_artifact.liberty_app_image.labels["LibertyVersion"]
+    ami_id          = data.hcp_packer_artifact.liberty_app_image.external_identifier
+    image_type      = data.hcp_packer_artifact.liberty_app_image.labels["ImageType"]
+    build_time      = data.hcp_packer_artifact.liberty_app_image.labels["BuildTime"]
+    deploy_mode     = "immutable"
+    packer_bucket   = var.hcp_packer_bucket_name
+    packer_channel  = var.hcp_packer_channel_name
+    managed_by      = "hcp-packer"
+  }
+}
 
 output "security_group_ids" {
   description = "Map of security group IDs keyed by component: liberty_app."
@@ -29,4 +43,9 @@ output "asg_alb_dns_name" {
 output "asg_name" {
   description = "Auto Scaling Group name"
   value       = aws_autoscaling_group.liberty_app.name
+}
+
+output "deployment_summary" {
+  description = "Liberty-app deployment metadata sourced from HCP Packer AMI tags"
+  value       = jsonencode(local.liberty_app_deployment_summary)
 }
