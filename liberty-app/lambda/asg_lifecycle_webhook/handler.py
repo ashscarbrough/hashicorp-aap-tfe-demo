@@ -101,12 +101,12 @@ def lambda_handler(event, context):
 def trigger_aap_job(instance_id):
     payload = json.dumps({
         "inventory": int(os.environ["AAP_INVENTORY_ID"]),
-        "extra_vars": {
+        "extra_vars": json.dumps({
             "ssm_instance_id":            instance_id,
             "aws_region":                 os.environ.get("AWS_REGION", "us-east-1"),
             "ansible_python_interpreter": "/usr/bin/python3",
             "liberty_server_name":        "liberty-app"
-        }
+        })
     }).encode("utf-8")
 
     req = urllib.request.Request(
