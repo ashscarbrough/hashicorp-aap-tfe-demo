@@ -92,20 +92,21 @@ resource "aws_instance" "liberty_base_host" {
 
 resource "null_resource" "liberty_base_aap_and_alb_gate" {
   triggers = {
-    instance_id = aws_instance.liberty_base_host.id
+    instance_id      = aws_instance.liberty_base_host.id
+    target_group_arn = aws_lb_target_group.liberty_base.arn
+    aws_region       = var.aws_region
   }
 
   provisioner "local-exec" {
     command = <<-EOT
       set -e
       echo "Waiting for new instance to be healthy in ALB after AAP configuration..."
-      echo "Instance: $INSTANCE_ID"
 
       for i in $(seq 1 40); do
         HEALTH=$(aws elbv2 describe-target-health \
-          --target-group-arn $TARGET_GROUP_ARN \
-          --targets Id=$INSTANCE_ID,Port=9080 \
-          --region $AWS_REGION \
+          --target-group-arn ${self.triggers.target_group_arn} \
+          --targets Id=${self.triggers.instance_id},Port=9080 \
+          --region ${self.triggers.aws_region} \
           --query 'TargetHealthDescriptions[0].TargetHealth.State' \
           --output text 2>/dev/null || echo "unknown")
 
@@ -121,13 +122,15 @@ resource "null_resource" "liberty_base_aap_and_alb_gate" {
       echo "Timed out waiting for ALB health after 10 minutes"
       exit 1
     EOT
-
-    environment = {
-      INSTANCE_ID      = aws_instance.liberty_base_host.id
-      TARGET_GROUP_ARN = aws_lb_target_group.liberty_base.arn
-      AWS_REGION       = var.aws_region
-    }
   }
 
   depends_on = [aws_instance.liberty_base_host]
+}
+
+resource "aws_lb_target_group_attachment" "liberty_base" {
+  target_group_arn = aws_lb_target_group.liberty_base.arn
+  target_id        = aws_instance.liberty_base_host.id
+  port             = 9080
+
+  depends_on = [null_resource.liberty_base_aap_and_alb_gate]
 }
