@@ -18,6 +18,6 @@ resource "aws_cloudwatch_event_rule" "liberty_app_asg_instance_launch" {
 
 resource "aws_cloudwatch_event_target" "liberty_app_asg_trigger" {
   rule      = aws_cloudwatch_event_rule.liberty_app_asg_instance_launch.name
-  target_id = "liberty-app-asg-lifecycle-hook-lambda"
-  arn       = aws_lambda_function.liberty_app_asg_lifecycle_hook.arn
+  target_id = "liberty-app-asg-lifecycle-webhook-lambda"
+  arn       = aws_lambda_function.liberty_app_asg_lifecycle_webhook.arn
 }

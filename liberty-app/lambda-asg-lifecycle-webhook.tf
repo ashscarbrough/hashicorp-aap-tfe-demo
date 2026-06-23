@@ -2,7 +2,7 @@
 # Lambda function for ASG lifecycle hook
 # ------------------------------------------------------------------------------
 # Zip the Lambda function code
-data "archive_file" "liberty_app_asg_lifecycle_hook" {
+data "archive_file" "liberty_app_asg_lifecycle_webhook" {
   type        = "zip"
   source_dir  = "${path.module}/lambda/asg_lifecycle_webhook"
   output_path = "${path.module}/lambda/liberty_app_asg_lifecycle_webhook.zip"
