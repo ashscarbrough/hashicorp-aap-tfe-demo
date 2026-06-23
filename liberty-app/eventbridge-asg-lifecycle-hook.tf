@@ -11,7 +11,7 @@ resource "aws_cloudwatch_event_rule" "liberty_app_asg_instance_launch" {
     source      = ["aws.autoscaling"]
     detail-type = ["EC2 Instance-launch Lifecycle Action"]
     detail = {
-      AutoScalingGroupName = [aws_autoscaling_group.liberty_app_asg.name]
+      AutoScalingGroupName = [aws_autoscaling_group.liberty_app.name]
     }
   })
 }

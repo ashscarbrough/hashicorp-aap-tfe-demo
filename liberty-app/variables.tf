@@ -112,6 +112,18 @@ variable "ec2_volume_size" {
   }
 }
 
+variable "ec2_iam_role_name" {
+  type        = string
+  description = "The name of the IAM role to attach to the EC2 instance."
+  default     = "liberty-app-ec2-role"
+}
+
+variable "ec2_instance_profile_name" {
+  type = string
+  description = "The name of the EC2 instance profile to attach to the instance."
+  default     = "liberty-app-ec2-instance-profile"
+}
+
 # ------------------------------------------------------------
 # HCP Packer variables
 # ------------------------------------------------------------

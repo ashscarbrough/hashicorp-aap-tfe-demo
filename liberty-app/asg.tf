@@ -88,8 +88,8 @@ resource "aws_launch_template" "liberty_app" {
       ManagedBy      = "terraform"
       AnsibleManaged = "true"
       DeploymentPath = "liberty-app"
-      Environment    = "demo"
-      Project        = "aap-tfe-al2023-demo"
+      Environment    = var.environment
+      Project        = "liberty-app-demo"
       AMIVersion     = data.hcp_packer_artifact.liberty_app_image.external_identifier
     }
   }
@@ -173,13 +173,13 @@ resource "aws_autoscaling_group" "liberty_app" {
 
   tag {
     key                 = "Environment"
-    value               = "demo"
+    value               = var.environment
     propagate_at_launch = true
   }
 
   tag {
     key                 = "Project"
-    value               = "aap-tfe-al2023-demo"
+    value               = "liberty-app-demo"
     propagate_at_launch = true
   }
 
