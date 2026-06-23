@@ -90,24 +90,30 @@ resource "aws_instance" "liberty_base_host" {
   }
 }
 
-locals {
-  liberty_base_tg_arn = aws_lb_target_group.liberty_base.arn
+# Look up the target group by name -- avoids the cycle that occurs
+# when referencing aws_lb_target_group.liberty_base directly
+data "aws_lb_target_group" "liberty_base_lookup" {
+  name = "${var.ec2_instance_name}-tg"
+
+  # Ensure the target group exists before this data source runs
+  depends_on = [aws_lb_target_group.liberty_base]
 }
 
 resource "null_resource" "liberty_base_aap_and_alb_gate" {
   triggers = {
-    instance_id = aws_instance.liberty_base_host.id
-    aws_region  = var.aws_region
+    instance_id      = aws_instance.liberty_base_host.id
+    target_group_arn = data.aws_lb_target_group.liberty_base_lookup.arn
+    aws_region       = var.aws_region
   }
 
   provisioner "local-exec" {
     command = <<-EOT
       set -e
-      echo "Waiting for new instance to be healthy in ALB..."
+      echo "Waiting for new instance to be healthy in ALB after AAP configuration..."
 
       for i in $(seq 1 40); do
         HEALTH=$(aws elbv2 describe-target-health \
-          --target-group-arn ${local.liberty_base_tg_arn} \
+          --target-group-arn ${self.triggers.target_group_arn} \
           --targets Id=${self.triggers.instance_id},Port=9080 \
           --region ${self.triggers.aws_region} \
           --query 'TargetHealthDescriptions[0].TargetHealth.State' \
