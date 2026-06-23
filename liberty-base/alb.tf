@@ -42,7 +42,7 @@ resource "aws_lb_target_group" "liberty_base" {
   }
 
   # Shorter deregistration delay for demo — default 300s is painful to watch live
-  deregistration_delay = 30
+  deregistration_delay = 120
 
   tags = {
     Name      = "${var.ec2_instance_name}-tg"
