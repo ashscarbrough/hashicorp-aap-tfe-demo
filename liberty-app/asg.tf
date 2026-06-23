@@ -121,7 +121,7 @@ resource "aws_launch_template" "liberty_app" {
 # The ALB health check gates traffic — instances only receive requests
 # once Liberty is healthy on /liberty-app/health.
 resource "aws_autoscaling_group" "liberty_app" {
-  name                = "${var.ec2_instance_name}-asg"
+  name_prefix         = "${var.ec2_instance_name}-asg"
   desired_capacity    = var.asg_desired_capacity
   min_size            = var.asg_min_size
   max_size            = var.asg_max_size

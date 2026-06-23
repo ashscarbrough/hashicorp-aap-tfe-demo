@@ -18,7 +18,7 @@ echo "SSM agent started"
 # Wait for SSM agent to register with the SSM service
 # This signal is consumed by Terraform's local-exec provisioner
 # which polls the same status before firing the AAP action trigger
-echo "Waiting for SSM agent to register with AWS SSM..."
+echo "Waiting for SSM agent to register with AWS SSM Service..."
 
 for i in $(seq 1 20); do
   STATUS=$(aws ssm describe-instance-information \
