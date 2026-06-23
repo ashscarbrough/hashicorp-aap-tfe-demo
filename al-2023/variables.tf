@@ -204,30 +204,30 @@ variable "packages_to_install" {
 # Auto Scaling Group variables
 # ------------------------------------------------------------
 
-variable "asg_min_size" {
-  description = "Minimum number of instances to maintain in the Auto Scaling Group"
-  type        = number
-  default     = 1
-}
+# variable "asg_min_size" {
+#   description = "Minimum number of instances to maintain in the Auto Scaling Group"
+#   type        = number
+#   default     = 1
+# }
 
-variable "asg_max_size" {
-  description = "Maximum number of instances to maintain in the Auto Scaling Group"
-  type        = number
-  default     = 1
-}
+# variable "asg_max_size" {
+#   description = "Maximum number of instances to maintain in the Auto Scaling Group"
+#   type        = number
+#   default     = 1
+# }
 
-variable "asg_desired_capacity" {
-  description = "Desired number of instances to maintain in the Auto Scaling Group"
-  type        = number
-  default     = 1
-}
+# variable "asg_desired_capacity" {
+#   description = "Desired number of instances to maintain in the Auto Scaling Group"
+#   type        = number
+#   default     = 1
+# }
 
-variable "asg_aap_job_template_id" {
-  description = "ID of the AAP job template to trigger from the ASG lifecycle hook Lambda function"
-  type        = number
-}
+# variable "asg_aap_job_template_id" {
+#   description = "ID of the AAP job template to trigger from the ASG lifecycle hook Lambda function"
+#   type        = number
+# }
 
-variable "asg_aap_inventory_id" {
-  description = "ID of the AAP inventory source to sync from the ASG lifecycle hook Lambda function"
-  type        = number
-}
+# variable "asg_aap_inventory_id" {
+#   description = "ID of the AAP inventory source to sync from the ASG lifecycle hook Lambda function"
+#   type        = number
+# }
