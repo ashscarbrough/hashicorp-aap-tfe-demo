@@ -42,6 +42,18 @@ def lambda_handler(event, context):
     asg_name              = detail.get("AutoScalingGroupName")
     lifecycle_action_token = detail.get("LifecycleActionToken")
 
+# Wait for SSM registration before triggering AAP
+    logger.info(f"Waiting for SSM registration on {instance_id}...")
+    if not wait_for_ssm(instance_id):
+        logger.error("SSM registration timeout -- sending ABANDON")
+        if lifecycle_hook_name and asg_name and lifecycle_action_token:
+            send_lifecycle_action(
+                asg_name, lifecycle_hook_name,
+                instance_id, lifecycle_action_token,
+                action="ABANDON"
+            )
+        return {"statusCode": 500, "body": "SSM registration timeout"}
+
     # ── Trigger AAP job template ──────────────────────────────────────────────
     try:
         run_id = trigger_aap_job(instance_id)
@@ -189,3 +201,26 @@ def send_lifecycle_action(asg_name, hook_name, instance_id, action_token, action
     except Exception as e:
         logger.error(f"Failed to complete lifecycle action: {e}")
         raise
+
+def wait_for_ssm(instance_id, max_attempts=20, interval=15):
+    """Wait for instance to register with SSM before triggering AAP."""
+    import boto3, time
+    ssm = boto3.client("ssm", region_name=os.environ.get("AWS_REGION", "us-east-1"))
+    
+    for attempt in range(1, max_attempts + 1):
+        try:
+            resp = ssm.describe_instance_information(
+                Filters=[{"Key": "InstanceIds", "Values": [instance_id]}]
+            )
+            instances = resp.get("InstanceInformationList", [])
+            if instances and instances[0].get("PingStatus") == "Online":
+                logger.info(f"Instance {instance_id} is SSM-Online after {attempt} attempts")
+                return True
+        except Exception as e:
+            logger.warning(f"SSM check attempt {attempt} error: {e}")
+        
+        logger.info(f"SSM wait attempt {attempt}/{max_attempts} — not yet online")
+        time.sleep(interval)
+    
+    logger.error(f"Instance {instance_id} did not register with SSM within timeout")
+    return False
