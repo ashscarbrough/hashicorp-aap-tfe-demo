@@ -67,10 +67,10 @@ resource "aws_launch_template" "liberty_app" {
   instance_type = var.ec2_instance_type
 
   # No key pair — SSM Session Manager handles all connectivity
-  key_name = var.connect_via_session_manager ? null : var.key_name
+  key_name = var.connect_via_session_manager ? null : aws_key_pair.liberty_app_key_pair[0].key_name
 
   iam_instance_profile {
-    name = aws_iam_instance_profile.liberty_app_ec2_instance_profile.name
+    name = aws_iam_instance_profile.liberty_app_instance_profile.name
   }
 
   vpc_security_group_ids = [aws_security_group.liberty_app_instance_sg.id]
@@ -186,4 +186,34 @@ resource "aws_autoscaling_group" "liberty_app" {
   lifecycle {
     create_before_destroy = true
   }
+}
+
+
+# TLS private key resource to generate SSH key pair for EC2 instance access. 
+# The private key will be stored securely in AWS Secrets Manager, and the 
+# public key will be used to create an AWS Key Pair for the EC2 instance.
+
+resource "tls_private_key" "aap_tfe_demo_host_key" {
+  count     = var.connect_via_session_manager ? 0 : 1
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "liberty_app_key_pair" {
+  count      = var.connect_via_session_manager ? 0 : 1
+  key_name   = "${var.key_name}-ec2-key"
+  public_key = tls_private_key.aap_tfe_demo_host_key[0].public_key_openssh
+}
+
+resource "aws_secretsmanager_secret" "liberty_app_host_private_key" {
+  count                   = var.connect_via_session_manager ? 0 : 1
+  name                    = "${var.key_name}/ec2-private-key"
+  description             = "RSA private key for EC2 SSH access"
+  recovery_window_in_days = 0
+}
+
+resource "aws_secretsmanager_secret_version" "liberty_app_host_private_key" {
+  count         = var.connect_via_session_manager ? 0 : 1
+  secret_id     = aws_secretsmanager_secret.liberty_app_host_private_key[0].id
+  secret_string = tls_private_key.aap_tfe_demo_host_key[0].private_key_openssh
 }

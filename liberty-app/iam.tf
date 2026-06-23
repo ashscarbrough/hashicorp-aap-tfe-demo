@@ -83,7 +83,7 @@ resource "aws_iam_role_policy" "ssm_session_logging" {
           "logs:DescribeLogGroups",
           "logs:DescribeLogStreams"
         ]
-        Resource = ["${aws_cloudwatch_log_group.ssm_sessions.arn}:*", "*"]
+        Resource = ["*"]
       }
     ]
   })
