@@ -149,6 +149,13 @@ resource "aws_autoscaling_group" "liberty_app" {
       min_healthy_percentage = 50
       instance_warmup        = 120
     }
+    triggers = ["launch_template"]
+  }
+
+  lifecycle {
+    create_before_destroy = true
+    # Do NOT replace the ASG on changes -- use instance_refresh instead
+    ignore_changes = [desired_capacity]
   }
 
   tag {

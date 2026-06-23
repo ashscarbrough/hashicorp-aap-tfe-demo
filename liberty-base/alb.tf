@@ -37,17 +37,19 @@ resource "aws_lb_target_group" "liberty_base" {
     healthy_threshold   = 2
     unhealthy_threshold = 3
     timeout             = 5
-    interval            = 15
+    interval            = 10
     matcher             = "200"
   }
 
   # Shorter deregistration delay for demo — default 300s is painful to watch live
-  deregistration_delay = 120
+  deregistration_delay = 240
 
   tags = {
     Name      = "${var.ec2_instance_name}-tg"
     ManagedBy = "terraform"
   }
+
+  depends_on = [null_resource.liberty_base_aap_and_alb_gate]
 }
 
 # --- Target Group Attachment ---

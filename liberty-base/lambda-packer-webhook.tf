@@ -42,7 +42,7 @@ resource "aws_lambda_function" "packer_webhook" {
 
   environment {
     variables = {
-      TARGET_BUCKET          = "liberty-base"
+      TARGET_BUCKET          = var.hcp_packer_bucket_name
       TFE_WORKSPACE_ID       = var.tfe_workspace_id
       TFE_TOKEN              = var.tfe_trigger_token
       PACKER_CHANNEL_FILTER  = var.hcp_packer_channel_name

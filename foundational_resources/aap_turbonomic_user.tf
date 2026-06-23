@@ -93,7 +93,18 @@ resource "aws_iam_user_policy" "aap_ssm_sessions" {
           "logs:DescribeLogStreams"
         ]
         Resource = "*"
-      }
+      },
+      {
+        Sid    = "DeploymentMetadataWrite"
+        Effect = "Allow"
+        Action = [
+          "ssm:PutParameter",
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:DeleteParameter"
+        ]
+        Resource = "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/liberty*"
+      },
     ]
   })
 }

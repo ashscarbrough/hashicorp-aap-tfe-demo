@@ -45,7 +45,7 @@ resource "aws_lambda_function" "packer_webhook" {
       TFE_WORKSPACE_ID       = var.tfe_workspace_id
       TFE_TOKEN              = var.tfe_trigger_token
       PACKER_CHANNEL_FILTER  = var.hcp_packer_channel_name
-      PACKER_BUCKET_FILTER   = "liberty-app"  # Hardcoded to the Liberty App bucket, as this Lambda is specific to that application
+      PACKER_BUCKET_FILTER   = var.hcp_packer_bucket_name
     }
   }
 }

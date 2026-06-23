@@ -89,3 +89,41 @@ resource "aws_instance" "liberty_base_host" {
     }
   }
 }
+
+resource "null_resource" "liberty_base_aap_and_alb_gate" {
+  triggers = {
+    instance_id = aws_instance.liberty_base_host.id
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -e
+      echo "Waiting for new instance to be healthy in ALB after AAP configuration..."
+      echo "Instance: ${aws_instance.liberty_base_host.id}"
+
+      for i in $(seq 1 40); do
+        HEALTH=$(aws elbv2 describe-target-health \
+          --target-group-arn ${aws_lb_target_group.liberty_base.arn} \
+          --targets Id=${aws_instance.liberty_base_host.id},Port=9080 \
+          --region ${var.aws_region} \
+          --query 'TargetHealthDescriptions[0].TargetHealth.State' \
+          --output text 2>/dev/null || echo "unknown")
+
+        echo "Attempt $i/40 -- ALB target health: $HEALTH"
+
+        if [ "$HEALTH" = "healthy" ]; then
+          echo "New instance is healthy and serving traffic -- safe to deregister old instance"
+          exit 0
+        fi
+        sleep 15
+      done
+
+      echo "Timed out waiting for ALB health after 10 minutes"
+      exit 1
+    EOT
+  }
+
+  # Depends on the instance -- which has wait_for_completion = true
+  # on its action_trigger, so this only runs after AAP finishes
+  depends_on = [aws_instance.liberty_base_host]
+}
