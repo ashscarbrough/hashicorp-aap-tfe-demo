@@ -46,6 +46,19 @@ resource "aws_lambda_function" "liberty_app_asg_lifecycle_webhook" {
   }
 }
 
+# --- ASG Lifecycle Hook ---
+resource "aws_autoscaling_lifecycle_hook" "liberty_app_launch" {
+  name                   = "liberty-app-launch-hook"
+  autoscaling_group_name = aws_autoscaling_group.liberty_app.name
+  lifecycle_transition   = "autoscaling:EC2_INSTANCE_LAUNCHING"
+
+  # How long to wait for Lambda to send CONTINUE before timing out
+  # 600s = 10 minutes -- matches Lambda poll timeout (40 x 15s)
+  heartbeat_timeout = 600
+
+  # Default action if Lambda times out or sends ABANDON
+  default_result = "ABANDON"
+}
 
 # ------------------------------------------------------------------------------
 # ASG lifecycle hook and EventBridge rule to trigger Lambda on instance launch
@@ -62,7 +75,7 @@ resource "aws_cloudwatch_event_rule" "liberty_app_asg_launch" {
     detail-type = ["EC2 Instance-launch Lifecycle Action"]
     detail = {
       AutoScalingGroupName = [aws_autoscaling_group.liberty_app.name]
-      LifecycleHookName    = [aws_autoscaling_lifecycle_hook.liberty_app_asg_aap_configure.name]
+      LifecycleHookName    = [aws_autoscaling_lifecycle_hook.liberty_app_launch.name]
     }
   })
 }
