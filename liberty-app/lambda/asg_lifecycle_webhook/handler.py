@@ -113,6 +113,7 @@ def lambda_handler(event, context):
 def trigger_aap_job(instance_id):
     payload = json.dumps({
         "inventory": int(os.environ["AAP_INVENTORY_ID"]),
+        "limit": instance_id,
         "extra_vars": json.dumps({
             "ssm_instance_id":            instance_id,
             "aws_region":                 os.environ.get("AWS_REGION", "us-east-1"),
