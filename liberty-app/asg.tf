@@ -108,6 +108,7 @@ resource "aws_launch_template" "liberty_app" {
 
   lifecycle {
     create_before_destroy = true
+    replace_triggered_by  = [null_resource.ami_version_tracker]
   }
 
   tags = {
@@ -149,7 +150,6 @@ resource "aws_autoscaling_group" "liberty_app" {
       min_healthy_percentage = 50
       instance_warmup        = 120
     }
-    triggers = ["launch_template"]
   }
 
   lifecycle {
