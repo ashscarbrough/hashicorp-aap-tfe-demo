@@ -170,6 +170,11 @@ variable "aap_configuration_job_template_id" {
   type        = number
 }
 
+variable "aap_inventory_id" {
+  description = "ID of the AAP inventory to use for the job template"
+  type        = number
+}
+
 # ------------------------------------------------------------
 # Auto Scaling Group variables
 # ------------------------------------------------------------

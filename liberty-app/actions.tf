@@ -8,6 +8,7 @@
 
 action "aap_job_launch" "configure_application_ssm" {
   config {
+    inventory_id = var.aap_inventory_id
     job_template_id = var.aap_configuration_job_template_id
     wait_for_completion = true
     wait_for_completion_timeout_seconds = 300 # 5 minute timeout for playbook completion, adjust as needed
@@ -23,6 +24,7 @@ action "aap_job_launch" "configure_application_ssm" {
 
 action "aap_job_launch" "install_packages" {
   config {
+    inventory_id = var.aap_inventory_id
     job_template_id     = 18
     wait_for_completion = true
     extra_vars = jsonencode({
