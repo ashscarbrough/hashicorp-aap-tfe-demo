@@ -99,13 +99,13 @@ def lambda_handler(event, context):
 
 
 def trigger_aap_job(instance_id):
-    """Trigger the AAP standalone job template with ssm_instance_id as extra var."""
-
     payload = json.dumps({
+        "inventory": int(os.environ["AAP_INVENTORY_ID"]),
         "extra_vars": {
             "ssm_instance_id":            instance_id,
-            "aws_region":                 AWS_REGION,
-            "ansible_python_interpreter": "/usr/bin/python3"
+            "aws_region":                 os.environ.get("AWS_REGION", "us-east-1"),
+            "ansible_python_interpreter": "/usr/bin/python3",
+            "liberty_server_name":        "liberty-app"
         }
     }).encode("utf-8")
 
@@ -119,13 +119,18 @@ def trigger_aap_job(instance_id):
         method="POST"
     )
 
-    with urllib.request.urlopen(req) as resp:
-        body = json.loads(resp.read().decode("utf-8"))
-        job_id = body.get("id")
-        if not job_id:
-            raise ValueError(f"No job ID in AAP response: {body}")
-        logger.info(f"AAP job launched with ID: {job_id}")
-        return job_id
+    try:
+        with urllib.request.urlopen(req) as resp:
+            body = json.loads(resp.read().decode("utf-8"))
+            job_id = body.get("id")
+            if not job_id:
+                raise ValueError(f"No job ID in AAP response: {body}")
+            logger.info(f"AAP job launched with ID: {job_id}")
+            return job_id
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode("utf-8")
+        logger.error(f"AAP API error {e.code}: {error_body}")
+        raise
 
 
 def poll_aap_job(job_id, max_attempts=40, interval=15):
