@@ -75,7 +75,11 @@ resource "aws_launch_template" "liberty_app" {
 
   vpc_security_group_ids = [aws_security_group.liberty_app_instance_sg.id]
 
-  user_data = base64encode(file("${path.module}/scripts/rhel9-userdata.sh"))
+  user_data = base64encode(templatefile("${path.module}/templates/liberty-app-userdata.sh.tpl", {
+    environment = var.environment
+    app_version = var.app_version
+    asg_name    = "${var.ec2_instance_name}-asg"
+  }))
 
   monitoring {
     enabled = true
@@ -193,7 +197,7 @@ resource "aws_autoscaling_group" "liberty_app" {
 # The private key will be stored securely in AWS Secrets Manager, and the 
 # public key will be used to create an AWS Key Pair for the EC2 instance.
 
-resource "tls_private_key" "aap_tfe_demo_host_key" {
+resource "tls_private_key" "liberty_app_host_key" {
   count     = var.connect_via_session_manager ? 0 : 1
   algorithm = "RSA"
   rsa_bits  = 4096
@@ -202,7 +206,7 @@ resource "tls_private_key" "aap_tfe_demo_host_key" {
 resource "aws_key_pair" "liberty_app_key_pair" {
   count      = var.connect_via_session_manager ? 0 : 1
   key_name   = "${var.key_name}-ec2-key"
-  public_key = tls_private_key.aap_tfe_demo_host_key[0].public_key_openssh
+  public_key = tls_private_key.liberty_app_host_key[0].public_key_openssh
 }
 
 resource "aws_secretsmanager_secret" "liberty_app_host_private_key" {
@@ -215,5 +219,5 @@ resource "aws_secretsmanager_secret" "liberty_app_host_private_key" {
 resource "aws_secretsmanager_secret_version" "liberty_app_host_private_key" {
   count         = var.connect_via_session_manager ? 0 : 1
   secret_id     = aws_secretsmanager_secret.liberty_app_host_private_key[0].id
-  secret_string = tls_private_key.aap_tfe_demo_host_key[0].private_key_openssh
+  secret_string = tls_private_key.liberty_app_host_key[0].private_key_openssh
 }

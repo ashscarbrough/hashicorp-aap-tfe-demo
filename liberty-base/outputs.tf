@@ -17,7 +17,7 @@ output "secretsmanager_secret_arn_ec2_private_key" {
 }
 
 output "ec2_private_key" {
-  value     = var.connect_via_session_manager ? null : tls_private_key.aap_tfe_demo_host_key[0].private_key_openssh
+  value     = var.connect_via_session_manager ? null : tls_private_key.liberty_base_host_key[0].private_key_openssh
   sensitive = true
 }
 
