@@ -126,11 +126,3 @@ resource "null_resource" "liberty_base_aap_and_alb_gate" {
 
   depends_on = [aws_instance.liberty_base_host]
 }
-
-resource "aws_lb_target_group_attachment" "liberty_base" {
-  target_group_arn = aws_lb_target_group.liberty_base.arn
-  target_id        = aws_instance.liberty_base_host.id
-  port             = 9080
-
-  depends_on = [null_resource.liberty_base_aap_and_alb_gate]
-}
